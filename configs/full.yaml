@@ -1,0 +1,57 @@
+# full.yaml — production overrides (merge on top of default.yaml)
+# Usage: load default.yaml first, then deep-merge this file.
+
+system:
+  device: "cuda"
+  fp16: true
+
+domains:
+  general:
+    max_docs: null           # all 8.8M passages
+    batch_size: 128
+    faiss_type: "IVF_PQ"
+    faiss_m: 64
+    faiss_nlist: 4096
+    bm25_enabled: true
+
+  science:
+    batch_size: 64
+    faiss_type: "Flat"       # scifact is small enough for exact search
+    bm25_enabled: true
+
+  finance:
+    batch_size: 64
+    faiss_type: "HNSW"
+    bm25_enabled: true
+
+  medical:
+    batch_size: 64
+    faiss_type: "HNSW"
+    bm25_enabled: true
+
+  legal:
+    batch_size: 64
+    faiss_type: "HNSW"
+    bm25_enabled: true
+
+  biomedical:
+    batch_size: 64
+    faiss_type: "Flat"       # nfcorpus is tiny
+    bm25_enabled: true
+
+chunking:
+  max_tokens: 256
+  stride: 64
+
+retrieval:
+  topk_dense: 1000
+  topk_bm25: 1000
+  k_fusion: 1000
+
+reranking:
+  enabled: true
+  topk_rerank: 200
+
+evaluation:
+  latency_trials: 1000
+  latency_warmup: 20

@@ -1,0 +1,38 @@
+# Large data files — download via scripts/download_data.py instead
+data/
+indexes/
+models/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Environments
+.env
+.venv
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Logs and results (keep structure, ignore large outputs)
+results/*.json
+results/*.csv
+*.log
+nohup.out
+
+# IDE
+.vscode/
+.idea/

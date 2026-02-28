@@ -1,0 +1,134 @@
+# default.yaml — smoke-test configuration (fast, small subsets, CPU-safe)
+# Load this first; full.yaml is merged on top for production runs.
+
+system:
+  device: "cpu"
+  fp16: false
+  seed: 42
+
+domains:
+  general:
+    enabled: true
+    dataset: "microsoft/ms_marco"
+    subset: "v2.1"
+    max_docs: 50000          # null = all 8.8M (use full.yaml)
+    encoder_model: "sentence-transformers/msmarco-bert-base-dot-v5"
+    batch_size: 32
+    faiss_type: "HNSW"       # HNSW | IVF_PQ | Flat
+    faiss_m: 32              # HNSW num links (or IVF_PQ subvectors)
+    faiss_nlist: 128         # IVF nlist (ignored for HNSW)
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+  science:
+    enabled: true
+    dataset: "mteb/scifact"
+    max_docs: null
+    encoder_model: "allenai/scibert_scivocab_uncased"
+    batch_size: 32
+    faiss_type: "Flat"       # scifact is tiny (~5k docs)
+    faiss_m: 32
+    faiss_nlist: 128
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+  finance:
+    enabled: true
+    dataset: "mteb/fiqa"
+    max_docs: null
+    encoder_model: "ProsusAI/finbert"
+    batch_size: 32
+    faiss_type: "HNSW"
+    faiss_m: 32
+    faiss_nlist: 128
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+  medical:
+    enabled: true
+    dataset: "mteb/trec-covid"
+    max_docs: 50000          # cap for default config (full 171k in full.yaml)
+    encoder_model: "emilyalsentzer/Bio_ClinicalBERT"
+    batch_size: 32
+    faiss_type: "HNSW"
+    faiss_m: 32
+    faiss_nlist: 128
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+  legal:
+    enabled: true
+    dataset: "isaacus/echr-retrieval"
+    max_docs: null
+    encoder_model: "nlpaueb/legal-bert-base-uncased"
+    batch_size: 32
+    faiss_type: "HNSW"
+    faiss_m: 32
+    faiss_nlist: 128
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+  biomedical:
+    enabled: true
+    dataset: "BeIR/nfcorpus"
+    max_docs: null
+    encoder_model: "dmis-lab/biobert-base-cased-v1.1"
+    batch_size: 32
+    faiss_type: "Flat"       # nfcorpus is tiny (~3.6k docs)
+    faiss_m: 32
+    faiss_nlist: 128
+    faiss_ef_construction: 200
+    faiss_ef_search: 128
+    bm25_enabled: false
+
+chunking:
+  max_tokens: 180
+  stride: 40
+  respect_sentence_boundaries: false
+
+retrieval:
+  topk_dense: 100
+  topk_bm25: 100
+  k_fusion: 100
+  rrf_k: 60
+
+routing:
+  # broadcast            — always query all 6 domain indexes
+  # routed_with_general  — top-1 domain + general (always); + top-2 if low confidence
+  # routed_only          — top-1 domain only; + top-2 if low confidence
+  mode: "routed_with_general"
+  confidence_threshold: 0.45
+  always_include_general: true
+
+reranking:
+  enabled: false
+  model: "colbert-ir/colbertv2.0"
+  topk_rerank: 50
+  batch_size: 8
+
+classification:
+  model_path: "models/domain_classifier"
+  base_model: "distilbert-base-uncased"
+  labels: ["general", "science", "finance", "medical", "legal", "biomedical"]
+  max_length: 64
+  min_queries_per_domain: 200    # augment with seeds if below this
+  max_queries_per_domain: 5000   # cap to prevent class imbalance
+
+paths:
+  data_root: "data/processed"
+  index_root: "indexes"
+  model_root: "models"
+  results_root: "results"
+
+bm25:
+  threads: 4
+
+evaluation:
+  metrics: ["mrr@10", "ndcg@10", "recall@100", "recall@1000"]
+  latency_trials: 50
+  latency_warmup: 5

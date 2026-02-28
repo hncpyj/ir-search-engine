@@ -1,0 +1,14 @@
+torch>=2.0.0
+transformers>=4.35.0
+sentence-transformers>=2.2.2
+datasets>=2.14.0
+faiss-gpu>=1.7.4        # swap for faiss-cpu if no GPU
+pyserini>=0.21.0        # requires Java 11+
+ragatouille>=0.0.7
+ir-measures>=0.3.1
+pyarrow>=12.0.0
+pandas>=2.0.0
+pyyaml>=6.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+tqdm>=4.65.0
