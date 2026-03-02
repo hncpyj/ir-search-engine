@@ -46,15 +46,54 @@ class MSMarcoAdapter(BaseAdapter):
             streaming=True,
         )
 
+    def _validation_relevant_passages(self) -> dict[str, str]:
+        """
+        Pre-collect all relevant (is_selected=1) passages from the validation
+        split so we can ensure they are included in the corpus.
+        Returns {orig_id: text}.
+        """
+        logger.info("[MSMarco] Pre-collecting validation relevant passages ...")
+        relevant: dict[str, str] = {}
+        for row in self._load("validation"):
+            passages = row["passages"]
+            texts = passages["passage_text"]
+            urls  = passages.get("url", [""] * len(texts))
+            for text, url, is_sel in zip(texts, urls, passages["is_selected"]):
+                if int(is_sel) > 0:
+                    oid = _passage_id(url, text)
+                    relevant[oid] = text
+        logger.info(f"[MSMarco] Found {len(relevant)} validation-relevant passages.")
+        return relevant
+
     def iter_documents(self) -> Iterator[Document]:
         """
-        Stream train split. Deduplicate passages by (url, text) hash.
-        Stops at max_docs if set.
+        Yield corpus documents.
+        Step 1: yield all validation-relevant passages first (ensures qrel coverage).
+        Step 2: stream train split to fill up to max_docs.
+        Deduplicates by (url, text) hash throughout.
         """
-        dataset = self._load("train")
         seen_ids: set[str] = set()
         count = 0
-        for row in dataset:
+
+        # ── Step 1: validation relevant passages ──────────────────────────
+        for orig_id, text in self._validation_relevant_passages().items():
+            if orig_id in seen_ids:
+                continue
+            seen_ids.add(orig_id)
+            yield Document(
+                doc_id=f"{DOMAIN}:{orig_id}",
+                title="",
+                text=text,
+                domain=DOMAIN,
+                orig_id=orig_id,
+            )
+            count += 1
+
+        # ── Step 2: fill remainder from train split ────────────────────────
+        for row in self._load("train"):
+            if self.max_docs and count >= self.max_docs:
+                logger.info(f"[MSMarco] Reached max_docs={self.max_docs}, stopping.")
+                return
             passages = row["passages"]
             texts = passages["passage_text"]
             urls  = passages.get("url", [""] * len(texts))

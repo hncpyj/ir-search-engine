@@ -54,6 +54,8 @@ def evaluate_single_domain(
     results_root: Path,
     run_ablation_flag: bool = False,
     measure_lat: bool = False,
+    max_queries: int | None = None,
+    domain_filter: bool = False,
 ) -> dict[str, float]:
     data_root = Path(cfg["paths"]["data_root"])
     queries_path = data_root / domain / "queries.parquet"
@@ -69,6 +71,14 @@ def evaluate_single_domain(
     queries_df = pd.read_parquet(queries_path)
     qrels_df = pd.read_parquet(qrels_path)
 
+    # Cap queries to those that have at least one qrel (avoids unannotated queries)
+    annotated_qids = set(qrels_df["query_id"].astype(str))
+    queries_df = queries_df[queries_df["query_id"].astype(str).isin(annotated_qids)].reset_index(drop=True)
+
+    if max_queries and len(queries_df) > max_queries:
+        queries_df = queries_df.sample(n=max_queries, random_state=42).reset_index(drop=True)
+        logger.info(f"[eval:{domain}] Sampled {max_queries} queries (from {len(annotated_qids)} annotated)")
+
     logger.info(
         f"[eval:{domain}] Evaluating {len(queries_df)} queries "
         f"against {len(qrels_df)} qrels ..."
@@ -79,19 +89,27 @@ def evaluate_single_domain(
         qid = str(qrow["query_id"])
         try:
             result = pipeline.search(str(qrow["text"]))
-            results_by_qid[qid] = result["results"]
+            hits = result["results"]
+            # domain_filter: keep only results from the target domain
+            # (gives BEIR-comparable single-domain scores)
+            if domain_filter:
+                hits = [r for r in hits if r.domain == domain]
+            results_by_qid[qid] = hits
         except Exception as e:
             logger.warning(f"[eval:{domain}] query error for {qid}: {e}")
             results_by_qid[qid] = []
 
-    metrics = evaluate_domain(qrels_df, results_by_qid, domain=domain)
-    print(f"\n=== {domain.upper()} Metrics ===")
+    tag = f"{domain}_domain_only" if domain_filter else domain
+    metrics = evaluate_domain(qrels_df, results_by_qid, domain=tag)
+    label = f"{domain.upper()} Metrics" + (" (domain-only)" if domain_filter else "")
+    print(f"\n=== {label} ===")
     for k, v in metrics.items():
         print(f"  {k}: {v:.4f}")
 
     # Save standard metrics
     results_root.mkdir(parents=True, exist_ok=True)
-    with open(results_root / f"{domain}_metrics.json", "w") as f:
+    fname = f"{domain}_domain_only_metrics.json" if domain_filter else f"{domain}_metrics.json"
+    with open(results_root / fname, "w") as f:
         json.dump(metrics, f, indent=2)
 
     # Latency
@@ -137,6 +155,9 @@ def main() -> None:
     parser.add_argument("--ablation", action="store_true", help="Run ablation conditions")
     parser.add_argument("--latency", action="store_true", help="Measure query latency")
     parser.add_argument("--output", default=None, help="Results directory (overrides config)")
+    parser.add_argument("--max-queries", type=int, default=None, help="Cap queries per domain (default: all)")
+    parser.add_argument("--domain-filter", action="store_true",
+                        help="Filter results to target domain only (BEIR-comparable single-domain scores)")
     args = parser.parse_args()
 
     cfg = load_config(args.config, args.override)
@@ -161,6 +182,8 @@ def main() -> None:
             results_root=results_root,
             run_ablation_flag=args.ablation,
             measure_lat=args.latency,
+            max_queries=args.max_queries,
+            domain_filter=args.domain_filter,
         )
         if m:
             all_metrics[domain] = m

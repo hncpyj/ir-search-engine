@@ -20,9 +20,22 @@ logger = logging.getLogger(__name__)
 # IR metrics via ir-measures
 # ---------------------------------------------------------------------------
 
+def _strip_chunk_suffix(doc_id: str) -> str:
+    """
+    Remove __chunkN suffix added during chunking so that retrieved chunk IDs
+    match the original doc IDs used in qrels.
+    e.g. 'science:4983__chunk0' -> 'science:4983'
+         'general:abc123__chunk2' -> 'general:abc123'
+    """
+    if "__chunk" in doc_id:
+        return doc_id.rsplit("__chunk", 1)[0]
+    return doc_id
+
+
 def _build_run(results_by_qid: dict[str, list]) -> list:
     """
     Convert {query_id: [RetrievalResult, ...]} to ir_measures ScoredDoc list.
+    Strips __chunkN suffix so doc_ids match qrels.
     Deduplicates by doc_id within each query (keeps highest score).
     """
     from ir_measures import ScoredDoc
@@ -30,11 +43,14 @@ def _build_run(results_by_qid: dict[str, list]) -> list:
     for qid, results in results_by_qid.items():
         best: dict[str, float] = {}
         for r in results:
-            if r.doc_id not in best or r.score > best[r.doc_id]:
-                best[r.doc_id] = r.score
+            # Normalise to original doc_id (strip chunk suffix)
+            orig_id = _strip_chunk_suffix(r.doc_id)
+            score = r.score
             # Use ColBERT score if available (it overrides fused/dense)
             if r.colbert_score and r.colbert_score > 0:
-                best[r.doc_id] = r.colbert_score
+                score = r.colbert_score
+            if orig_id not in best or score > best[orig_id]:
+                best[orig_id] = score
         for doc_id, score in best.items():
             scored.append(ScoredDoc(qid, doc_id, score))
     return scored

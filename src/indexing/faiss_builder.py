@@ -11,6 +11,10 @@ NOTE: We use raw transformers (AutoTokenizer + AutoModel) instead of
 SentenceTransformer.encode() to avoid the macOS multiprocessing/semaphore
 crash that sentence-transformers 5.x triggers when spawning DataLoader
 workers on Python 3.9.
+
+NOTE 2: faiss is imported lazily (inside build_index / save) to avoid a
+macOS BLAS conflict where importing faiss before torch model inference causes
+a silent crash on Apple Silicon (Accelerate framework collision).
 """
 from __future__ import annotations
 
@@ -18,7 +22,6 @@ import json
 import logging
 from pathlib import Path
 
-import faiss
 import numpy as np
 import pandas as pd
 import torch
@@ -134,12 +137,13 @@ class FAISSIndexBuilder:
     # Index construction
     # ------------------------------------------------------------------
 
-    def build_index(self, embeddings: np.ndarray) -> faiss.Index:
+    def build_index(self, embeddings: np.ndarray):
+        import faiss  # lazy import — must come AFTER all torch model inference
         D  = embeddings.shape[1]
         ft = self.faiss_type
 
         if ft == "Flat":
-            index: faiss.Index = faiss.IndexFlatIP(D)
+            index = faiss.IndexFlatIP(D)
 
         elif ft == "HNSW":
             index = faiss.IndexHNSWFlat(D, self.faiss_m, faiss.METRIC_INNER_PRODUCT)
@@ -184,10 +188,11 @@ class FAISSIndexBuilder:
 
     def save(
         self,
-        index: faiss.Index,
+        index,
         corpus_df: pd.DataFrame,
         output_dir: Path,
     ) -> None:
+        import faiss  # lazy import — must come AFTER all torch model inference
         output_dir.mkdir(parents=True, exist_ok=True)
 
         faiss.write_index(index, str(output_dir / "faiss.index"))

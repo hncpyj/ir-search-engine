@@ -1,0 +1,11 @@
+# classifier_balanced.yaml — override to balance domain classifier training
+# Caps large domains (general, finance) and upsamples small domains (medical, legal)
+# to ~1000-1200 queries each, making training ~6x more balanced.
+#
+# Usage:
+#   python scripts/train_domain_classifier.py --config configs/default.yaml \
+#       --override configs/classifier_balanced.yaml
+
+classification:
+  min_queries_per_domain: 1000   # augment medical (50) and legal (200) up to 1000
+  max_queries_per_domain: 1200   # cap general (101k) and finance (6k) down to 1200
