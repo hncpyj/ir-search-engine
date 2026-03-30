@@ -161,6 +161,11 @@ def main() -> None:
     args = parser.parse_args()
 
     cfg = load_config(args.config, args.override)
+    import torch
+    if not torch.cuda.is_available():
+        cfg["system"]["device"] = "cpu"
+        cfg["system"]["fp16"] = False
+        cfg["reranking"]["enabled"] = False  # ColBERT requires CUDA
     results_root = Path(args.output or cfg["paths"]["results_root"])
 
     domains = (

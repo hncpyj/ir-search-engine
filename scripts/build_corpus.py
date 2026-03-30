@@ -26,10 +26,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.adapters.msmarco_adapter import MSMarcoAdapter
 from src.adapters.scifact_adapter import ScifactAdapter
+from src.adapters.scidocs_adapter import ScidocsAdapter
 from src.adapters.fiqa_adapter import FiqaAdapter
 from src.adapters.treccovid_adapter import TrecCovidAdapter
 from src.adapters.nfcorpus_adapter import NfcorpusAdapter
-from src.adapters.echr_adapter import EchrAdapter
 from src.preprocessing.chunker import SlidingWindowChunker
 from src.config import load_config
 
@@ -41,20 +41,20 @@ logger = logging.getLogger("build_corpus")
 
 ADAPTER_MAP = {
     "general": MSMarcoAdapter,
+    "scidocs": ScidocsAdapter,
     "science": ScifactAdapter,
     "finance": FiqaAdapter,
     "medical": TrecCovidAdapter,
     "biomedical": NfcorpusAdapter,
-    "legal": EchrAdapter,
 }
 
 # Use the domain's own encoder tokenizer for chunking (consistent token counts).
 TOKENIZER_MAP = {
     "general": "sentence-transformers/msmarco-bert-base-dot-v5",
+    "scidocs": "allenai/scibert_scivocab_uncased",
     "science": "allenai/scibert_scivocab_uncased",
     "finance": "ProsusAI/finbert",
     "medical": "emilyalsentzer/Bio_ClinicalBERT",
-    "legal": "nlpaueb/legal-bert-base-uncased",
     "biomedical": "dmis-lab/biobert-base-cased-v1.1",
 }
 
@@ -80,8 +80,7 @@ def build_domain(
         AdapterClass = ADAPTER_MAP[domain]
         adapter = AdapterClass(domain_cfg)
 
-        # Determine eval split (MS MARCO uses 'validation', BEIR uses 'test')
-        eval_split = "validation" if domain == "general" else "test"
+        eval_split = "test"
 
         logger.info(f"[{domain}] Loading queries and qrels (split={eval_split}) ...")
         corpus_df, queries_df, qrels_df = adapter.to_dataframes(split=eval_split)

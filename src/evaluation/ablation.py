@@ -34,7 +34,7 @@ _BM25_ONLY_OVERRIDES = {
 _DENSE_ONLY_OVERRIDES = {
     "domains": {
         d: {"bm25_enabled": False}
-        for d in ["general", "science", "finance", "medical", "legal", "biomedical"]
+        for d in ["general", "scidocs", "science", "finance", "medical", "biomedical"]
     },
     "reranking": {"enabled": False},
 }
@@ -62,7 +62,7 @@ DEFAULT_CONDITIONS: list[AblationCondition] = [
     ),
     AblationCondition(
         "routing_broadcast",
-        "Query all 6 domain indexes (broadcast)",
+        "Query all domain indexes (broadcast)",
         {"routing": {"mode": "broadcast"}},
     ),
     AblationCondition(

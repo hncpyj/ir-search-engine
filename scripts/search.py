@@ -95,6 +95,11 @@ def main() -> None:
         parser.error("Provide --query or --batch")
 
     cfg = load_config(args.config, args.override)
+    import torch
+    if not torch.cuda.is_available():
+        cfg["system"]["device"] = "cpu"
+        cfg["system"]["fp16"] = False
+        cfg["reranking"]["enabled"] = False  # ColBERT requires CUDA
     pipeline = SearchPipeline(cfg)
     logger.info("Loading pipeline ...")
     pipeline.load()

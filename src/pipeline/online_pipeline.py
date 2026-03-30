@@ -98,12 +98,10 @@ class SearchPipeline:
             self.dense_retrievers[domain] = retriever
 
             if domain_cfg.get("bm25_enabled", False):
-                lucene_dir = (
-                    Path(paths["index_root"]) / "bm25" / domain / "lucene_index"
-                )
+                bm25_dir = Path(paths["index_root"]) / "bm25" / domain
                 docstore_path = index_dir / "docstore.parquet"
-                if lucene_dir.exists() and docstore_path.exists():
-                    bm25 = BM25Retriever(domain, lucene_dir, docstore_path)
+                if (bm25_dir / "bm25.pkl").exists() and docstore_path.exists():
+                    bm25 = BM25Retriever(domain, bm25_dir, docstore_path)
                     bm25.load()
                     self.bm25_retrievers[domain] = bm25
                 else:
@@ -186,21 +184,32 @@ class SearchPipeline:
         # 3. Route and retrieve
         active_domains = self._get_active_domains(clf)
         t = time.perf_counter()
-        ranked_lists: list[list[RetrievalResult]] = []
 
+        # Stage 1: within-domain fusion (BM25 + Dense → one list per domain)
+        domain_fused: list[list[RetrievalResult]] = []
         for domain in active_domains:
+            domain_lists: list[list[RetrievalResult]] = []
             if domain in self.dense_retrievers:
-                res = self.dense_retrievers[domain].search(norm_q, self._topk_dense)
-                ranked_lists.append(res)
+                domain_lists.append(
+                    self.dense_retrievers[domain].search(norm_q, self._topk_dense)
+                )
             if domain in self.bm25_retrievers:
-                res = self.bm25_retrievers[domain].search(norm_q, self._topk_bm25)
-                ranked_lists.append(res)
+                domain_lists.append(
+                    self.bm25_retrievers[domain].search(norm_q, self._topk_bm25)
+                )
+            if domain_lists:
+                within = (
+                    self.fuser.fuse(domain_lists, topk=self._k_fusion)
+                    if len(domain_lists) > 1
+                    else domain_lists[0]
+                )
+                domain_fused.append(within)
 
         lat["retrieve_ms"] = (time.perf_counter() - t) * 1000
 
-        # 4. Fuse
+        # 4. Stage 2: cross-domain fusion
         t = time.perf_counter()
-        fused = self.fuser.fuse(ranked_lists, topk=self._k_fusion)
+        fused = self.fuser.fuse(domain_fused, topk=self._k_fusion) if domain_fused else []
         lat["fuse_ms"] = (time.perf_counter() - t) * 1000
 
         # 5. Rerank

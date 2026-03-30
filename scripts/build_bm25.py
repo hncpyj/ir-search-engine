@@ -1,15 +1,12 @@
 """
 build_bm25.py — Offline Phase Step 3 (optional)
 
-Builds Pyserini BM25 Lucene indexes for domains where bm25_enabled=true.
-
-Prerequisites:
-    java -version  # must show Java 11+
-    pip install pyserini
+Builds rank-bm25 BM25Okapi indexes (bm25.pkl) for domains where bm25_enabled=true.
+No Java required.
 
 Usage:
-    python scripts/build_bm25.py --config configs/default.yaml --domain science
-    python scripts/build_bm25.py --config configs/full.yaml   # all bm25-enabled domains
+    python scripts/build_bm25.py --config configs/full.yaml          # all bm25-enabled domains
+    python scripts/build_bm25.py --config configs/full.yaml --domain science
 """
 from __future__ import annotations
 
@@ -43,10 +40,9 @@ def build_domain_bm25(domain: str, cfg: dict, force: bool = False) -> None:
         )
         return
 
-    lucene_dir = output_dir / "lucene_index"
-    if lucene_dir.exists() and not force:
+    if (output_dir / "bm25.pkl").exists() and not force:
         logger.info(
-            f"[{domain}] Lucene index exists — skipping (use --force to rebuild)."
+            f"[{domain}] BM25 index exists — skipping (use --force to rebuild)."
         )
         return
 
@@ -62,7 +58,12 @@ def main() -> None:
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
-    cfg = load_config(args.config, args.override)
+    # Always load default.yaml as base; treat --config as override if it differs
+    default_cfg = "configs/default.yaml"
+    if args.config == default_cfg:
+        cfg = load_config(default_cfg, args.override)
+    else:
+        cfg = load_config(default_cfg, args.config)
 
     if args.domain:
         domains = [args.domain]

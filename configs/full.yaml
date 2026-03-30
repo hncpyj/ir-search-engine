@@ -14,6 +14,11 @@ domains:
     faiss_nlist: 4096
     bm25_enabled: true
 
+  scidocs:
+    batch_size: 64
+    faiss_type: "HNSW"
+    bm25_enabled: true
+
   science:
     batch_size: 64
     faiss_type: "Flat"       # scifact is small enough for exact search
@@ -29,11 +34,6 @@ domains:
     faiss_type: "HNSW"
     bm25_enabled: true
 
-  legal:
-    batch_size: 64
-    faiss_type: "HNSW"
-    bm25_enabled: true
-
   biomedical:
     batch_size: 64
     faiss_type: "Flat"       # nfcorpus is tiny
@@ -44,13 +44,13 @@ chunking:
   stride: 64
 
 retrieval:
-  topk_dense: 1000
-  topk_bm25: 1000
-  k_fusion: 1000
+  topk_dense: 100
+  topk_bm25: 100
+  k_fusion: 200          # BM25 top-100 + Dense top-100 → up to 200 unique candidates
 
 reranking:
   enabled: true
-  topk_rerank: 200
+  topk_rerank: 200       # rerank full candidate pool (justified: BM25+Dense each give 100)
 
 evaluation:
   latency_trials: 1000
