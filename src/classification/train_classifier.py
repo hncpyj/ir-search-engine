@@ -32,7 +32,7 @@ from .seed_queries import SEEDS
 
 logger = logging.getLogger(__name__)
 
-DOMAIN_LABELS = ["general", "science", "finance", "medical", "legal", "biomedical"]
+DOMAIN_LABELS = ["general", "science", "scidocs", "finance", "medical", "biomedical"]
 LABEL2ID = {d: i for i, d in enumerate(DOMAIN_LABELS)}
 ID2LABEL = {i: d for d, i in LABEL2ID.items()}
 

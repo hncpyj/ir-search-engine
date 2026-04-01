@@ -42,10 +42,10 @@ class BM25Retriever:
             data = pickle.load(f)
         self._bm25 = data["bm25"]
         self._chunk_ids = data["chunk_ids"]
-        self._docstore = pd.read_parquet(self.docstore_path)
+        self._docstore = pd.read_parquet(self.docstore_path).reset_index(drop=True)
         self._chunk_to_row = {
             str(cid): int(i)
-            for i, cid in self._docstore["chunk_id"].items()
+            for i, cid in enumerate(self._docstore["chunk_id"])
         }
         logger.info(
             f"[{self.domain}] BM25Retriever loaded "

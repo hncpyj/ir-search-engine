@@ -12,14 +12,19 @@ SentenceTransformer.encode() to avoid the macOS multiprocessing/semaphore
 crash that sentence-transformers 5.x triggers when spawning DataLoader
 workers on Python 3.9.
 
-NOTE 2: faiss is imported lazily (inside build_index / save) to avoid a
-macOS BLAS conflict where importing faiss before torch model inference causes
-a silent crash on Apple Silicon (Accelerate framework collision).
+NOTE 2: FAISS index building runs in a FRESH subprocess (via _faiss_index_worker.py)
+that has never imported torch or transformers.  This completely sidesteps the
+macOS Apple Silicon segfault where PyTorch's Accelerate BLAS and FAISS's
+Accelerate BLAS conflict at index.add() time (Python 3.12+, ARM64).
+Embeddings are passed via a temporary .npy file on disk.
 """
 from __future__ import annotations
 
 import json
 import logging
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -108,8 +113,18 @@ class FAISSIndexBuilder:
         self.ef_construction: int = dcfg.get("faiss_ef_construction", 200)
         self.ef_search: int       = dcfg.get("faiss_ef_search", 128)
 
-        self.device: str = scfg.get("device", "cpu")
-        self.fp16: bool  = scfg.get("fp16", False)
+        # Auto-detect best device for PyTorch inference.
+        # MPS (Apple Silicon) is preferred over CPU; CUDA over MPS.
+        # Note: FAISS does not support MPS — index operations always run on CPU.
+        configured = scfg.get("device", "cpu")
+        if configured == "cpu":
+            import torch
+            if torch.cuda.is_available():
+                configured = "cuda"
+            elif torch.backends.mps.is_available():
+                configured = "mps"
+        self.device: str = configured
+        self.fp16: bool  = scfg.get("fp16", False) and self.device == "cuda"
 
     # ------------------------------------------------------------------
     # Encoding
@@ -191,6 +206,7 @@ class FAISSIndexBuilder:
         index,
         corpus_df: pd.DataFrame,
         output_dir: Path,
+        embeddings: np.ndarray = None,
     ) -> None:
         import faiss  # lazy import — must come AFTER all torch model inference
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -209,6 +225,16 @@ class FAISSIndexBuilder:
         with open(output_dir / "id_mapping.json", "w") as f:
             json.dump(id_mapping, f)
 
+        metadata = {
+            "encoder_model": self.encoder_model,
+            "dimension": int(embeddings.shape[1]) if embeddings is not None else index.d,
+            "num_vectors": int(index.ntotal),
+            "faiss_type": self.faiss_type,
+            "normalized": True,
+        }
+        with open(output_dir / "index_metadata.json", "w") as f:
+            json.dump(metadata, f, indent=2)
+
         logger.info(f"[{self.domain}] Index artifacts saved to {output_dir}")
 
     # ------------------------------------------------------------------
@@ -216,8 +242,58 @@ class FAISSIndexBuilder:
     # ------------------------------------------------------------------
 
     def build(self, corpus_parquet: Path, output_dir: Path) -> None:
-        """Full pipeline: load → encode → index → save."""
+        """Full pipeline: load → encode → (subprocess) index → save."""
         df         = pd.read_parquet(corpus_parquet)
         embeddings = self.encode_corpus(df)
-        index      = self.build_index(embeddings)
-        self.save(index, df, output_dir)
+
+        # ── Flush PyTorch / GPU state before handing off to subprocess ──────
+        import gc
+        gc.collect()
+        if torch.backends.mps.is_available():
+            torch.mps.empty_cache()
+        elif torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+        # ── Write embeddings to a temp file, run FAISS in a clean subprocess ─
+        # On macOS Apple Silicon (Python 3.12+) both PyTorch-CPU and FAISS use
+        # Apple Accelerate/BLAS.  Loading both in the same process causes a
+        # silent crash at index.add().  Spawning a fresh process that imports
+        # ONLY numpy + faiss (never torch) completely avoids the conflict.
+        with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+
+        try:
+            np.save(str(tmp_path), embeddings)
+            logger.info(
+                f"[{self.domain}] Embeddings saved to {tmp_path} "
+                f"({embeddings.nbytes / 1e6:.1f} MB) — spawning FAISS worker ..."
+            )
+
+            worker = Path(__file__).parent / "_faiss_index_worker.py"
+            worker_args = json.dumps({
+                "emb_path":       str(tmp_path),
+                "corpus_path":    str(corpus_parquet),
+                "output_dir":     str(output_dir),
+                "faiss_type":     self.faiss_type,
+                "faiss_m":        self.faiss_m,
+                "faiss_nlist":    self.faiss_nlist,
+                "ef_construction": self.ef_construction,
+                "ef_search":      self.ef_search,
+                "encoder_model":  self.encoder_model,
+                "domain":         self.domain,
+            })
+
+            result = subprocess.run(
+                [sys.executable, str(worker), worker_args],
+                check=False,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"[{self.domain}] FAISS worker exited with code {result.returncode}"
+                )
+            logger.info(f"[{self.domain}] FAISS worker completed successfully.")
+
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
+                logger.debug(f"[{self.domain}] Temp embeddings file removed.")

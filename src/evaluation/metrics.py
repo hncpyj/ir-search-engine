@@ -36,7 +36,15 @@ def _build_run(results_by_qid: dict[str, list]) -> list:
     """
     Convert {query_id: [RetrievalResult, ...]} to ir_measures ScoredDoc list.
     Strips __chunkN suffix so doc_ids match qrels.
-    Deduplicates by doc_id within each query (keeps highest score).
+    Deduplicates by doc_id within each query (keeps highest fused score).
+
+    IMPORTANT: we rank by fused_score (RRF), NOT by raw dense score.
+    Raw dense scores are NOT comparable across domains — MSMARCO's encoder
+    consistently returns higher cosine similarities (~0.88) than domain-
+    specific encoders (~0.73), so sorting by r.score would always push
+    general-domain results to the top even when querying a specialist index.
+    fused_score is the post-RRF score, which is comparable across domains.
+    ColBERT score overrides fused when available.
     """
     from ir_measures import ScoredDoc
     scored = []
@@ -45,10 +53,12 @@ def _build_run(results_by_qid: dict[str, list]) -> list:
         for r in results:
             # Normalise to original doc_id (strip chunk suffix)
             orig_id = _strip_chunk_suffix(r.doc_id)
-            score = r.score
-            # Use ColBERT score if available (it overrides fused/dense)
+            # Use ColBERT score if available, else use fused (RRF) score.
+            # fused_score is cross-domain comparable; raw r.score is not.
             if r.colbert_score and r.colbert_score > 0:
                 score = r.colbert_score
+            else:
+                score = r.fused_score if r.fused_score > 0 else r.score
             if orig_id not in best or score > best[orig_id]:
                 best[orig_id] = score
         for doc_id, score in best.items():

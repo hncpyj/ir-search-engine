@@ -73,14 +73,32 @@ class DenseRetriever:
     def load(self) -> None:
         """Load all artifacts. Call once before searching."""
         self._index = faiss.read_index(str(self.index_dir / "faiss.index"))
-        self._docstore = pd.read_parquet(self.index_dir / "docstore.parquet")
+        self._docstore = pd.read_parquet(self.index_dir / "docstore.parquet").reset_index(drop=True)
         with open(self.index_dir / "id_mapping.json") as f:
             raw = json.load(f)
         self._id_mapping = {int(k): v for k, v in raw.items()}
         self._chunk_to_row = {
             str(cid): int(i)
-            for i, cid in self._docstore["chunk_id"].items()
+            for i, cid in enumerate(self._docstore["chunk_id"])
         }
+
+        # Validate index metadata if available
+        meta_path = self.index_dir / "index_metadata.json"
+        if meta_path.exists():
+            with open(meta_path) as f:
+                meta = json.load(f)
+            if not meta.get("normalized", True):
+                logger.warning(
+                    f"[{self.domain}] index_metadata.json says vectors are NOT "
+                    "normalised — cosine similarity via inner product will be incorrect."
+                )
+            stored_model = meta.get("encoder_model", "")
+            if stored_model and stored_model != self.encoder_model:
+                logger.warning(
+                    f"[{self.domain}] encoder mismatch: index built with "
+                    f"'{stored_model}' but loading with '{self.encoder_model}'"
+                )
+
         self._tokenizer = AutoTokenizer.from_pretrained(self.encoder_model)
         self._model = AutoModel.from_pretrained(self.encoder_model)
         self._model.to(self.device)
