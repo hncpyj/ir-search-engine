@@ -25,7 +25,7 @@ from ..retrieval.hybrid_fusion import RRFFusion
 
 logger = logging.getLogger(__name__)
 
-ALL_DOMAINS = ["general", "science", "finance", "medical", "legal", "biomedical"]
+ALL_DOMAINS = ["general", "scidocs", "science", "finance", "medical", "biomedical"]
 
 
 class SearchPipeline:

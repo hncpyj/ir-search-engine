@@ -60,11 +60,11 @@ class ScifactAdapter(BaseAdapter):
             )
 
     def iter_qrels(self, split: str = "test") -> Iterator[QRel]:
-        # qrels live in the "default" config, "test" split
+        # qrels live in the "default" config; respects split parameter (BUG-8 fix)
         qrels = load_dataset(
             "mteb/scifact",
             name="default",
-            split="test",
+            split=split,
             streaming=True,
         )
         for row in qrels:

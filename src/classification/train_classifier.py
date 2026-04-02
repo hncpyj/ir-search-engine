@@ -71,6 +71,10 @@ def load_domain_queries(
     Load query texts from queries.parquet for each domain.
     - Augments with seed queries if domain has < min_per_domain.
     - Caps at max_per_domain to prevent class imbalance.
+    - BUG-3 fix: excludes qrel-annotated queries (BEIR evaluation queries) from
+      training data to prevent train/eval leakage in routing evaluation.
+      evaluate_routing.py samples from qrel-annotated queries only, so excluding
+      them here ensures the routing eval is on genuinely held-out data.
     Returns (texts, int_labels).
     """
     all_texts: list[str] = []
@@ -79,12 +83,23 @@ def load_domain_queries(
 
     for domain in DOMAIN_LABELS:
         label = LABEL2ID[domain]
-        qpath = data_root / domain / "queries.parquet"
+        qpath  = data_root / domain / "queries.parquet"
+        qrpath = data_root / domain / "qrels.parquet"
 
         texts: list[str] = []
         if qpath.exists():
             df = pd.read_parquet(qpath)
             if "text" in df.columns:
+                # Exclude qrel-annotated (evaluation) queries to prevent leakage
+                if qrpath.exists():
+                    qrels_df = pd.read_parquet(qrpath)
+                    eval_qids = set(qrels_df["query_id"].astype(str).unique())
+                    n_before = len(df)
+                    df = df[~df["query_id"].astype(str).isin(eval_qids)]
+                    logger.info(
+                        f"[classifier] {domain}: excluded {n_before - len(df)} "
+                        f"eval queries (BUG-3 fix), {len(df)} training queries remain"
+                    )
                 texts = df["text"].dropna().tolist()
             logger.info(f"[classifier] {domain}: loaded {len(texts)} queries from parquet")
         else:

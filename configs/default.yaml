@@ -50,7 +50,7 @@ domains:
     enabled: true
     dataset: "mteb/fiqa"
     max_docs: null
-    encoder_model: "ProsusAI/finbert"
+    encoder_model: "BAAI/bge-base-en-v1.5"  # BUG-5 fix: replaced ProsusAI/finbert (sentiment classifier, not retrieval) with BAAI/bge-base-en-v1.5 (retrieval-trained, top MTEB FiQA scorer)
     batch_size: 32
     faiss_type: "HNSW"
     faiss_m: 32
@@ -115,7 +115,7 @@ classification:
   base_model: "distilbert-base-uncased"
   labels: ["general", "science", "scidocs", "finance", "medical", "biomedical"]
   max_length: 64
-  min_queries_per_domain: 200    # augment with seeds if below this
+  min_queries_per_domain: 500    # augment with seeds if below this (medical/scidocs have 0 non-eval queries)
   max_queries_per_domain: 5000   # cap to prevent class imbalance
 
 paths:

@@ -2,7 +2,7 @@
 Hybrid fusion — Reciprocal Rank Fusion (RRF) across multiple ranked lists.
 
 Handles results from multiple domains and/or multiple modalities (dense + BM25).
-Deduplicates by doc_id (keeps best metadata from highest-score chunk).
+Deduplicates by doc_id (keeps best metadata from the highest-ranked chunk).
 """
 from __future__ import annotations
 
@@ -40,18 +40,27 @@ class RRFFusion:
         """
         rrf_scores: dict[str, float] = defaultdict(float)
         best_result: dict[str, RetrievalResult] = {}
+        best_rank: dict[str, int] = {}  # lowest (best) rank seen per doc_id
 
         for ranked_list in ranked_lists:
             for rank, result in enumerate(ranked_list):
                 rrf_score = 1.0 / (self.rrf_k + rank + 1)
                 rrf_scores[result.doc_id] += rrf_score
 
-                # Keep the result with highest raw score as representative
+                # BUG-9 fix: select representative chunk by best rank (lowest rank
+                # number), not by raw dense score.  Raw dense scores are not
+                # cross-domain comparable — MSMARCO encoder produces scores ~0.88
+                # while domain encoders produce ~0.73, so picking by r.score
+                # would consistently favour title-only or general-domain chunks
+                # with high cosine similarity rather than the most relevant passage.
+                # Rank position is a fair proxy: the chunk ranked highest in any
+                # list is most likely to contain the answer text.
                 if (
                     result.doc_id not in best_result
-                    or result.score > best_result[result.doc_id].score
+                    or rank < best_rank[result.doc_id]
                 ):
                     best_result[result.doc_id] = result
+                    best_rank[result.doc_id] = rank
 
         sorted_ids = sorted(
             rrf_scores, key=lambda d: rrf_scores[d], reverse=True

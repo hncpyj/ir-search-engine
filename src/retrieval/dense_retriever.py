@@ -60,8 +60,19 @@ class DenseRetriever:
         self.domain = domain
         self.index_dir = Path(index_dir)
         self.encoder_model = encoder_model
+        # BUG-4 fix: auto-detect MPS/CUDA for query encoding so it matches the
+        # device used during index building (faiss_builder.py does the same).
+        # Without this, indexes built with MPS produce embeddings that are
+        # numerically slightly different from CPU query embeddings, breaking
+        # reproducibility and potentially harming ranking quality.
+        if device == "cpu":
+            import torch as _torch
+            if _torch.cuda.is_available():
+                device = "cuda"
+            elif _torch.backends.mps.is_available():
+                device = "mps"
         self.device = device
-        self.fp16 = fp16
+        self.fp16 = fp16 and device == "cuda"
 
         self._index: Optional[faiss.Index] = None
         self._docstore: Optional[pd.DataFrame] = None
