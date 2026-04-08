@@ -22,18 +22,18 @@ from src.pipeline.online_pipeline import SearchPipeline
 DOMAIN_COLOURS = {
     "general":    "#6366f1",  # indigo
     "science":    "#0ea5e9",  # sky blue
+    "scidocs":    "#f59e0b",  # amber
     "finance":    "#10b981",  # emerald
     "medical":    "#ef4444",  # red
-    "legal":      "#f59e0b",  # amber
     "biomedical": "#8b5cf6",  # violet
 }
 
 DOMAIN_ICONS = {
     "general":    "🌐",
     "science":    "🔬",
+    "scidocs":    "📚",
     "finance":    "📈",
     "medical":    "🏥",
-    "legal":      "⚖️",
     "biomedical": "🧬",
 }
 

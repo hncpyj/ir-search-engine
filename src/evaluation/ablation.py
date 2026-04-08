@@ -125,6 +125,19 @@ def run_ablation(
 
     rows = []
     for cond in conditions:
+        # Skip reranking conditions when CUDA is not available
+        if cond.overrides.get("reranking", {}).get("enabled", False):
+            try:
+                import torch
+                if not torch.cuda.is_available():
+                    logger.warning(
+                        f"[ablation:{domain}] Skipping {cond.name} (requires CUDA for ColBERT)"
+                    )
+                    continue
+            except ImportError:
+                logger.warning(f"[ablation:{domain}] Skipping {cond.name} (torch not available)")
+                continue
+
         logger.info(f"[ablation:{domain}] Running condition: {cond.name}")
         cfg = _deep_merge(base_cfg, cond.overrides)
         pipeline = pipeline_factory(cfg)

@@ -165,7 +165,8 @@ def main() -> None:
     if not torch.cuda.is_available():
         cfg["system"]["device"] = "cpu"
         cfg["system"]["fp16"] = False
-        cfg["reranking"]["enabled"] = False  # ColBERT requires CUDA
+        # Reranking is allowed on CPU via cross-encoder fallback (see online_pipeline.load).
+        # Only disable if no reranking backend is available.
     results_root = Path(args.output or cfg["paths"]["results_root"])
 
     domains = (

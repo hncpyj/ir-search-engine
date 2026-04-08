@@ -1,0 +1,10 @@
+{
+  "judge": "cross-encoder (cross-encoder/ms-marco-MiniLM-L-6-v2)",
+  "metrics": {
+    "domain_coverage@10": 0.8846153846153846,
+    "mean_domains_in_top10": 1.9230769230769231,
+    "expected_domain_hit@10": 0.19230769230769232,
+    "n_queries": 26,
+    "cross_encoder_nDCG@10": 0.7820848542249386
+  }
+}

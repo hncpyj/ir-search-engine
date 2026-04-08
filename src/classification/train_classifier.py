@@ -29,6 +29,7 @@ from transformers import (
 )
 
 from .seed_queries import SEEDS
+from .query_split import is_train_query
 
 logger = logging.getLogger(__name__)
 
@@ -90,15 +91,25 @@ def load_domain_queries(
         if qpath.exists():
             df = pd.read_parquet(qpath)
             if "text" in df.columns:
-                # Exclude qrel-annotated (evaluation) queries to prevent leakage
+                # Deterministic train/eval split (replaces BUG-3 "exclude all qrel queries" fix).
+                # Qrel queries split 70/30 by hash(query_id); evaluate_routing.py uses the
+                # same split for the eval half, so there is no leakage.
                 if qrpath.exists():
                     qrels_df = pd.read_parquet(qrpath)
-                    eval_qids = set(qrels_df["query_id"].astype(str).unique())
+                    qrel_qids = set(qrels_df["query_id"].astype(str).unique())
                     n_before = len(df)
-                    df = df[~df["query_id"].astype(str).isin(eval_qids)]
+                    qid_str = df["query_id"].astype(str)
+                    is_qrel = qid_str.isin(qrel_qids)
+                    is_train_split = qid_str.map(is_train_query)
+                    # Keep: (a) non-qrel queries (always safe to train on), or
+                    #       (b) qrel queries that fall in the training split
+                    df = df[(~is_qrel) | (is_qrel & is_train_split)]
+                    n_qrel_train = int((is_qrel & is_train_split).sum())
+                    n_qrel_eval  = int((is_qrel & ~is_train_split).sum())
                     logger.info(
-                        f"[classifier] {domain}: excluded {n_before - len(df)} "
-                        f"eval queries (BUG-3 fix), {len(df)} training queries remain"
+                        f"[classifier] {domain}: split qrel queries into "
+                        f"{n_qrel_train} train / {n_qrel_eval} eval (held out); "
+                        f"total training queries: {len(df)} (was {n_before})"
                     )
                 texts = df["text"].dropna().tolist()
             logger.info(f"[classifier] {domain}: loaded {len(texts)} queries from parquet")

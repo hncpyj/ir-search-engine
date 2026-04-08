@@ -18,33 +18,33 @@ domains:
     faiss_nlist: 128         # IVF nlist (ignored for HNSW)
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
   scidocs:
     enabled: true
     dataset: "mteb/scidocs"
     max_docs: null
-    encoder_model: "allenai/scibert_scivocab_uncased"
+    encoder_model: "BAAI/bge-base-en-v1.5"  # was scibert (non-retrieval MLM); replaced with retrieval-trained encoder
     batch_size: 32
     faiss_type: "HNSW"
     faiss_m: 32
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
   science:
     enabled: true
     dataset: "mteb/scifact"
     max_docs: null
-    encoder_model: "allenai/scibert_scivocab_uncased"
+    encoder_model: "BAAI/bge-base-en-v1.5"  # was scibert (non-retrieval MLM); replaced with retrieval-trained encoder
     batch_size: 32
     faiss_type: "Flat"       # scifact is tiny (~5k docs)
     faiss_m: 32
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
   finance:
     enabled: true
@@ -57,33 +57,33 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
   medical:
     enabled: true
     dataset: "mteb/trec-covid"
     max_docs: 50000          # cap for default config (full 171k in full.yaml)
-    encoder_model: "emilyalsentzer/Bio_ClinicalBERT"
+    encoder_model: "BAAI/bge-base-en-v1.5"  # was Bio_ClinicalBERT (non-retrieval MLM); replaced with retrieval-trained encoder
     batch_size: 32
     faiss_type: "HNSW"
     faiss_m: 32
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
   biomedical:
     enabled: true
     dataset: "BeIR/nfcorpus"
     max_docs: null
-    encoder_model: "dmis-lab/biobert-base-cased-v1.1"
+    encoder_model: "BAAI/bge-base-en-v1.5"  # was BioBERT (non-retrieval MLM); replaced with retrieval-trained encoder
     batch_size: 32
     faiss_type: "Flat"       # nfcorpus is tiny (~3.6k docs)
     faiss_m: 32
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: false
+    bm25_enabled: true
 
 chunking:
   max_tokens: 180
@@ -105,10 +105,12 @@ routing:
   always_include_general: true
 
 reranking:
-  enabled: false
-  model: "colbert-ir/colbertv2.0"
+  enabled: true
+  backend: "auto"  # auto picks colbert if ragatouille+CUDA available, else cross-encoder
+  model: "cross-encoder/ms-marco-MiniLM-L-6-v2"  # CPU-friendly default
+  cross_encoder_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
   topk_rerank: 50
-  batch_size: 8
+  batch_size: 16
 
 classification:
   model_path: "models/domain_classifier"

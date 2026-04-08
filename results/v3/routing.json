@@ -1,0 +1,38 @@
+{
+  "top1_accuracy": 0.972,
+  "top2_accuracy": 0.9949,
+  "macro_f1": 0.9494,
+  "n_total": 787,
+  "per_domain": {
+    "biomedical": {
+      "top1_accuracy": 0.978,
+      "n_queries": 91,
+      "mean_confidence": 0.9747
+    },
+    "finance": {
+      "top1_accuracy": 0.995,
+      "n_queries": 199,
+      "mean_confidence": 0.9893
+    },
+    "general": {
+      "top1_accuracy": 0.95,
+      "n_queries": 200,
+      "mean_confidence": 0.9876
+    },
+    "medical": {
+      "top1_accuracy": 0.7692,
+      "n_queries": 13,
+      "mean_confidence": 0.9467
+    },
+    "scidocs": {
+      "top1_accuracy": 0.975,
+      "n_queries": 200,
+      "mean_confidence": 0.97
+    },
+    "science": {
+      "top1_accuracy": 0.9881,
+      "n_queries": 84,
+      "mean_confidence": 0.9819
+    }
+  }
+}

@@ -109,13 +109,37 @@ class SearchPipeline:
                         f"[pipeline] BM25 index not found for {domain}, skipping BM25."
                     )
 
-        # ColBERT reranker
+        # Reranker (ColBERT if CUDA + ragatouille available, else cross-encoder)
         if cfg["reranking"].get("enabled", False):
-            from ..reranking.colbert_reranker import ColBERTReranker
-            self.reranker = ColBERTReranker(
-                model_name=cfg["reranking"]["model"],
-                topk=cfg["reranking"]["topk_rerank"],
-            )
+            backend = cfg["reranking"].get("backend", "auto")
+            model_name = cfg["reranking"]["model"]
+            topk_rerank = cfg["reranking"]["topk_rerank"]
+
+            use_colbert = False
+            if backend in ("auto", "colbert"):
+                try:
+                    import torch  # noqa: F401
+                    import ragatouille  # noqa: F401
+                    use_colbert = True
+                except ImportError:
+                    use_colbert = False
+
+            if use_colbert and "colbert" in model_name.lower():
+                from ..reranking.colbert_reranker import ColBERTReranker
+                self.reranker = ColBERTReranker(
+                    model_name=model_name,
+                    topk=topk_rerank,
+                )
+            else:
+                from ..reranking.cross_encoder_reranker import CrossEncoderReranker
+                ce_model = cfg["reranking"].get(
+                    "cross_encoder_model",
+                    "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                )
+                self.reranker = CrossEncoderReranker(
+                    model_name=ce_model,
+                    topk=min(topk_rerank, 50),  # CPU-friendly cap
+                )
             self.reranker.load()
 
         logger.info(
@@ -189,7 +213,7 @@ class SearchPipeline:
         domain_fused: list[list[RetrievalResult]] = []
         for domain in active_domains:
             domain_lists: list[list[RetrievalResult]] = []
-            if domain in self.dense_retrievers:
+            if domain in self.dense_retrievers and self._topk_dense > 0:
                 domain_lists.append(
                     self.dense_retrievers[domain].search(norm_q, self._topk_dense)
                 )
