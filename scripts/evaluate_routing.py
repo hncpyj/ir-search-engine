@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.config import load_config
 from src.classification.domain_classifier import DomainClassifier
+from src.classification.query_split import is_eval_query
 
 logging.basicConfig(
     level=logging.INFO,
@@ -71,9 +72,13 @@ def load_domain_queries(
         queries_df = pd.read_parquet(q_path)
         qrels_df   = pd.read_parquet(qr_path)
 
-        # Keep only queries that have at least one qrel (= evaluation queries)
-        eval_qids = set(qrels_df["query_id"].unique())
-        eval_df   = queries_df[queries_df["query_id"].isin(eval_qids)].copy()
+        # Keep only qrel-annotated queries that fall in the held-out eval split.
+        # The same split is enforced in train_classifier.py so there is no leakage.
+        qrel_qids = set(qrels_df["query_id"].astype(str).unique())
+        qid_str = queries_df["query_id"].astype(str)
+        is_qrel = qid_str.isin(qrel_qids)
+        is_eval_split = qid_str.map(is_eval_query)
+        eval_df = queries_df[is_qrel & is_eval_split].copy()
 
         if len(eval_df) == 0:
             logger.warning(f"[routing] No eval queries for domain '{domain}'.")

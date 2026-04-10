@@ -1,0 +1,7 @@
+domain,condition,description,R@100,R@1000,nDCG@10,RR@10
+science,dense_only,"Dense retrieval only, no BM25, no reranking",0.115,0.115,0.05779324861524415,0.04822222222222222
+science,bm25_only,"BM25 only, no dense, no reranking",0.13277777777777777,0.13277777777777777,0.0783359388904888,0.07025396825396825
+science,hybrid_no_rerank,"Dense + BM25 hybrid (RRF), no reranking",0.14916666666666667,0.14916666666666667,0.0837708477940726,0.04319444444444444
+science,routing_broadcast,Query all domain indexes (broadcast),0.1322222222222222,0.1322222222222222,0.0754004721657001,0.011111111111111106
+science,routing_routed_general,Routed to top-1 domain + general fallback,0.14916666666666667,0.14916666666666667,0.0837708477940726,0.04319444444444444
+science,routing_routed_only,Routed to top-1 domain only (no general fallback),0.15,0.15,0.09496650628613534,0.08859126984126983
