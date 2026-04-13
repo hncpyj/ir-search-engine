@@ -62,15 +62,37 @@ class QueryDataset(Dataset):
 # Data loading
 # ---------------------------------------------------------------------------
 
+def _load_docstore_titles(index_root: Path, domain: str, rng: random.Random) -> list[str]:
+    """
+    Load document titles from the FAISS docstore as pseudo-queries.
+
+    Document titles (e.g. paper titles, article headings) carry strong domain
+    signal and are far more diverse than repeated seed templates.  For domains
+    with very few real queries (medical: 37 training queries), this provides
+    thousands of unique, domain-specific training examples.
+    """
+    docstore_path = index_root / "faiss" / domain / "docstore.parquet"
+    if not docstore_path.exists():
+        return []
+    df = pd.read_parquet(docstore_path, columns=["title"])
+    titles = df["title"].dropna().str.strip()
+    # Filter out very short or generic titles
+    titles = titles[titles.str.len() > 15].unique().tolist()
+    rng.shuffle(titles)
+    logger.info(f"[classifier] {domain}: {len(titles)} document titles available for augmentation")
+    return titles
+
+
 def load_domain_queries(
     data_root: Path,
     min_per_domain: int = 200,
     max_per_domain: int = 5000,
     seed: int = 42,
+    index_root: Path | None = None,
 ) -> tuple[list[str], list[int]]:
     """
     Load query texts from queries.parquet for each domain.
-    - Augments with seed queries if domain has < min_per_domain.
+    - Augments with document titles first, then seed queries as fallback.
     - Caps at max_per_domain to prevent class imbalance.
     - BUG-3 fix: excludes qrel-annotated queries (BEIR evaluation queries) from
       training data to prevent train/eval leakage in routing evaluation.
@@ -81,6 +103,9 @@ def load_domain_queries(
     all_texts: list[str] = []
     all_labels: list[int] = []
     rng = random.Random(seed)
+
+    if index_root is None:
+        index_root = Path("indexes")
 
     for domain in DOMAIN_LABELS:
         label = LABEL2ID[domain]
@@ -116,17 +141,30 @@ def load_domain_queries(
         else:
             logger.warning(f"[classifier] {domain}: queries.parquet not found at {qpath}")
 
-        # Augment with seeds if below minimum
-        seeds = SEEDS.get(domain, [])
-        if len(texts) < min_per_domain and seeds:
-            # Repeat seeds until we have enough
-            extra = []
-            while len(texts) + len(extra) < min_per_domain:
-                extra.extend(seeds)
-            texts = texts + extra[:max(0, min_per_domain - len(texts))]
-            logger.info(
-                f"[classifier] {domain}: augmented to {len(texts)} with seed queries"
-            )
+        # Augment if below minimum — prefer document titles over seed repetition
+        if len(texts) < min_per_domain:
+            # Strategy 1: document titles (diverse, domain-specific)
+            doc_titles = _load_docstore_titles(index_root, domain, rng)
+            if doc_titles:
+                need = min_per_domain - len(texts)
+                title_sample = doc_titles[:need]
+                texts = texts + title_sample
+                logger.info(
+                    f"[classifier] {domain}: augmented with {len(title_sample)} "
+                    f"document titles (total now {len(texts)})"
+                )
+
+            # Strategy 2: seed queries as fallback if still below minimum
+            if len(texts) < min_per_domain:
+                seeds = SEEDS.get(domain, [])
+                if seeds:
+                    extra = []
+                    while len(texts) + len(extra) < min_per_domain:
+                        extra.extend(seeds)
+                    texts = texts + extra[:max(0, min_per_domain - len(texts))]
+                    logger.info(
+                        f"[classifier] {domain}: augmented to {len(texts)} with seed queries"
+                    )
 
         # Cap to max_per_domain
         if len(texts) > max_per_domain:
@@ -175,12 +213,14 @@ def train(
     min_per_domain: int = 200,
     max_per_domain: int = 5000,
     seed: int = 42,
+    index_root: str | None = None,
 ) -> None:
     torch.manual_seed(seed)
     np.random.seed(seed)
 
     texts, labels = load_domain_queries(
-        Path(data_root), min_per_domain, max_per_domain, seed
+        Path(data_root), min_per_domain, max_per_domain, seed,
+        index_root=Path(index_root) if index_root else None,
     )
 
     train_texts, val_texts, train_labels, val_labels = train_test_split(

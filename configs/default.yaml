@@ -18,7 +18,7 @@ domains:
     faiss_nlist: 128         # IVF nlist (ignored for HNSW)
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
   scidocs:
     enabled: true
@@ -31,7 +31,7 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
   science:
     enabled: true
@@ -44,7 +44,7 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
   finance:
     enabled: true
@@ -57,7 +57,7 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
   medical:
     enabled: true
@@ -70,7 +70,7 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
   biomedical:
     enabled: true
@@ -83,7 +83,7 @@ domains:
     faiss_nlist: 128
     faiss_ef_construction: 200
     faiss_ef_search: 128
-    bm25_enabled: true
+    bm25_enabled: false
 
 chunking:
   max_tokens: 180

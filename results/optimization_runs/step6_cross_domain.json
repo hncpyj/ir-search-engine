@@ -1,0 +1,389 @@
+{
+  "step": "cross_domain_eval",
+  "timestamp": "2026-04-11T11:44:49.905823",
+  "metrics": {
+    "domain_coverage@10": 0.8846153846153846,
+    "mean_domains_in_top10": 1.9230769230769231,
+    "expected_domain_hit@10": 0.19230769230769232,
+    "n_queries": 26,
+    "cross_encoder_nDCG@10": 0.7820848542249386
+  },
+  "per_query": [
+    {
+      "query_id": "xd_01",
+      "text": "How does machine learning improve drug discovery in pharmaceutical research?",
+      "expected_domains": [
+        "biomedical",
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_02",
+      "text": "What are the economic impacts of climate change on global agriculture?",
+      "expected_domains": [
+        "finance",
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_03",
+      "text": "How do neural networks process natural language understanding?",
+      "expected_domains": [
+        "science",
+        "scidocs",
+        "general"
+      ],
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_04",
+      "text": "What is the role of CRISPR in treating genetic diseases?",
+      "expected_domains": [
+        "biomedical",
+        "medical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_05",
+      "text": "How does blockchain technology affect financial regulation?",
+      "expected_domains": [
+        "finance",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": true
+    },
+    {
+      "query_id": "xd_06",
+      "text": "What are the side effects of COVID-19 vaccines on the immune system?",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_07",
+      "text": "How do interest rates affect stock market returns?",
+      "expected_domains": [
+        "finance",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": true
+    },
+    {
+      "query_id": "xd_08",
+      "text": "What is the relationship between gut microbiome and mental health?",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general"
+      ],
+      "n_domains": 1,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_09",
+      "text": "How does renewable energy investment impact portfolio diversification?",
+      "expected_domains": [
+        "finance",
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_10",
+      "text": "What methods detect antibiotic resistance in hospital settings?",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_11",
+      "text": "How does deep learning improve medical image diagnosis?",
+      "expected_domains": [
+        "medical",
+        "science",
+        "scidocs"
+      ],
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_12",
+      "text": "What causes inflation and how does it affect consumer spending?",
+      "expected_domains": [
+        "finance",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": true
+    },
+    {
+      "query_id": "xd_13",
+      "text": "What are the latest findings on Alzheimer's disease biomarkers?",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_14",
+      "text": "How do citation networks reveal scientific collaboration patterns?",
+      "expected_domains": [
+        "scidocs",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_15",
+      "text": "What is the mechanism of mRNA vaccines?",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_16",
+      "text": "How does quantitative easing affect bond yields?",
+      "expected_domains": [
+        "finance",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": true
+    },
+    {
+      "query_id": "xd_17",
+      "text": "What role do proteins play in cell signaling pathways?",
+      "expected_domains": [
+        "biomedical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general"
+      ],
+      "n_domains": 1,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_18",
+      "text": "How effective is telemedicine for chronic disease management?",
+      "expected_domains": [
+        "medical",
+        "general"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": true
+    },
+    {
+      "query_id": "xd_19",
+      "text": "What are the environmental impacts of cryptocurrency mining?",
+      "expected_domains": [
+        "finance",
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "biomedical",
+        "general",
+        "medical"
+      ],
+      "n_domains": 3,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_20",
+      "text": "How do graph neural networks model molecular structures?",
+      "expected_domains": [
+        "science",
+        "scidocs",
+        "biomedical"
+      ],
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_21",
+      "text": "What dietary factors contribute to cardiovascular disease risk?",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "general"
+      ],
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_22",
+      "text": "How does natural language processing improve financial sentiment analysis?",
+      "expected_domains": [
+        "finance",
+        "science"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_23",
+      "text": "What is the current understanding of long COVID syndrome?",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_24",
+      "text": "How do randomized controlled trials establish drug efficacy?",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "science"
+      ],
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_25",
+      "text": "What machine learning methods detect financial fraud?",
+      "expected_domains": [
+        "finance",
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "n_domains": 2,
+      "expected_hit": false
+    },
+    {
+      "query_id": "xd_26",
+      "text": "What is the evidence for dark matter in astrophysics?",
+      "expected_domains": [
+        "science",
+        "general"
+      ],
+      "domains_in_top10": [
+        "general"
+      ],
+      "n_domains": 1,
+      "expected_hit": false
+    }
+  ]
+}
