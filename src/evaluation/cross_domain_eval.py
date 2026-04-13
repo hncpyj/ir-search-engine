@@ -32,9 +32,11 @@ logger = logging.getLogger(__name__)
 
 QUERIES_PATH = Path(__file__).parent.parent.parent / "data" / "cross_domain" / "queries.jsonl"
 OLLAMA_CACHE_PATH = Path(__file__).parent.parent.parent / "data" / "cross_domain" / "ollama_judgements.jsonl"
+OPENAI_CACHE_PATH = Path(__file__).parent.parent.parent / "data" / "cross_domain" / "openai_judgements.jsonl"
 CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 OLLAMA_DEFAULT_MODEL = "llama3.1:8b-instruct-q4_K_M"
 OLLAMA_BASE_URL = "http://localhost:11434"
+OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
 
 
 # ---------------------------------------------------------------------------
@@ -166,6 +168,120 @@ class OllamaJudge:
 
 
 # ---------------------------------------------------------------------------
+# Tier 3: OpenAI LLM relevance judge (API-based)
+# ---------------------------------------------------------------------------
+
+class OpenAIJudge:
+    """
+    LLM relevance judge via OpenAI API.
+
+    Uses GPT-4o-mini (or any OpenAI chat model) to score (query, document)
+    pairs on a 0-2 scale, following the same FeB4RAG / TREC 2024 LLMJudge
+    methodology as OllamaJudge.
+
+    Results are cached to disk so repeated runs skip already-judged pairs
+    and avoid redundant API costs.
+    """
+
+    judge_label = "openai"
+
+    def __init__(
+        self,
+        model: str = OPENAI_DEFAULT_MODEL,
+        api_key: str | None = None,
+        cache_path: Path = OPENAI_CACHE_PATH,
+    ):
+        self.model = model
+        self.api_key = api_key
+        self.cache_path = Path(cache_path)
+        self._cache: dict[str, int] = {}
+        self._client = None
+
+    def load(self) -> None:
+        """Load cache from disk and initialise OpenAI client."""
+        import os
+        key = self.api_key or os.environ.get("OPENAI_API_KEY")
+        if not key:
+            raise RuntimeError(
+                "OpenAI API key required. Set OPENAI_API_KEY env var or pass --openai-key."
+            )
+        from openai import OpenAI
+        self._client = OpenAI(api_key=key)
+
+        if self.cache_path.exists():
+            with open(self.cache_path, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        entry = json.loads(line)
+                        self._cache[entry["key"]] = entry["score"]
+        logger.info(
+            f"[OpenAIJudge] model={self.model}, "
+            f"cache_entries={len(self._cache)}"
+        )
+
+    def _cache_key(self, query_id: str, doc_id: str) -> str:
+        return f"openai:{query_id}:{doc_id}"
+
+    def _save_entry(self, key: str, score: int) -> None:
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.cache_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"key": key, "score": score}) + "\n")
+
+    def _call_api(self, prompt: str) -> int:
+        resp = self._client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            max_tokens=8,
+        )
+        text = resp.choices[0].message.content.strip()
+        for char in text:
+            if char in "012":
+                return int(char)
+        logger.warning(f"[OpenAIJudge] Unexpected response '{text}', defaulting to 1")
+        return 1
+
+    def score(
+        self,
+        query: str,
+        results: list,
+        topk: int = 10,
+        query_id: str = "",
+    ) -> list[float]:
+        """Score top-k results, using cache where available."""
+        scores: list[float] = []
+        for r in results[:topk]:
+            key = self._cache_key(query_id or query[:30], r.doc_id)
+            if key in self._cache:
+                scores.append(float(self._cache[key]))
+                continue
+
+            snippet = f"{r.title or ''} {r.text or ''}"[:400]
+            prompt = (
+                "Rate the relevance of the following document to the query.\n"
+                "Use this scale:\n"
+                "  0 = not relevant\n"
+                "  1 = partially relevant\n"
+                "  2 = highly relevant\n\n"
+                f"Query: {query}\n"
+                f"Document: {snippet}\n\n"
+                "Reply with only a single integer: 0, 1, or 2."
+            )
+            try:
+                s = self._call_api(prompt)
+            except Exception as e:
+                logger.warning(f"[OpenAIJudge] API error ({key}): {e} — defaulting to 1")
+                s = 1
+
+            self._cache[key] = s
+            self._save_entry(key, s)
+            scores.append(float(s))
+
+        return scores
+
+
+# ---------------------------------------------------------------------------
 # Tier 3: Cross-encoder judge (fallback, no Ollama required)
 # ---------------------------------------------------------------------------
 
@@ -222,7 +338,7 @@ class CrossEncoderJudge:
 # Type alias
 # ---------------------------------------------------------------------------
 
-AnyJudge = Union[OllamaJudge, CrossEncoderJudge]
+AnyJudge = Union[OllamaJudge, OpenAIJudge, CrossEncoderJudge]
 
 
 # ---------------------------------------------------------------------------

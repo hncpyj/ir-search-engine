@@ -1,0 +1,94 @@
+{
+  "step": "baseline",
+  "timestamp": "2026-04-11T11:00:48.951685",
+  "per_domain_metrics": {
+    "general": {
+      "RR@10": 0.006348069313685359,
+      "R@1000": 0.007020057306590258,
+      "nDCG@10": 0.0064568244165533265,
+      "R@100": 0.007020057306590258
+    },
+    "scidocs": {
+      "RR@10": 0.013901190476190475,
+      "R@1000": 0.02068333333333333,
+      "nDCG@10": 0.008080188664443601,
+      "R@100": 0.02068333333333333
+    },
+    "science": {
+      "RR@10": 0.11944444444444442,
+      "R@1000": 0.15666666666666668,
+      "nDCG@10": 0.12403047635543843,
+      "R@100": 0.15666666666666668
+    },
+    "finance": {
+      "RR@10": 0.027100480109739367,
+      "R@1000": 0.040090953285397725,
+      "nDCG@10": 0.021287781572316478,
+      "R@100": 0.040090953285397725
+    },
+    "medical": {
+      "RR@10": 0.8166666666666668,
+      "R@1000": 0.07153078625083102,
+      "nDCG@10": 0.731266032118881,
+      "R@100": 0.07153078625083102
+    },
+    "biomedical": {
+      "RR@10": 0.06245638606319721,
+      "R@1000": 0.038014761495109434,
+      "nDCG@10": 0.03115637216694517,
+      "R@100": 0.038014761495109434
+    }
+  },
+  "routing": {
+    "top1_accuracy": 0.9695,
+    "macro_f1": 0.9469,
+    "n_total": 787,
+    "per_domain": {
+      "biomedical": {
+        "top1_accuracy": 0.978,
+        "n_queries": 91,
+        "mean_confidence": 0.9747
+      },
+      "finance": {
+        "top1_accuracy": 0.995,
+        "n_queries": 199,
+        "mean_confidence": 0.9893
+      },
+      "general": {
+        "top1_accuracy": 0.95,
+        "n_queries": 200,
+        "mean_confidence": 0.9876
+      },
+      "medical": {
+        "top1_accuracy": 0.7692,
+        "n_queries": 13,
+        "mean_confidence": 0.9467
+      },
+      "scidocs": {
+        "top1_accuracy": 0.965,
+        "n_queries": 200,
+        "mean_confidence": 0.9706
+      },
+      "science": {
+        "top1_accuracy": 0.9881,
+        "n_queries": 84,
+        "mean_confidence": 0.9819
+      }
+    }
+  },
+  "cross_domain": {
+    "domain_coverage@10": 0.2692307692307692,
+    "mean_domains_in_top10": 1.3076923076923077,
+    "expected_domain_hit@10": 0.07692307692307693,
+    "n_queries": 26,
+    "cross_encoder_nDCG@10": 0.9649589413511321
+  },
+  "config_snapshot": {
+    "rrf_k": 60,
+    "topk_dense": 100,
+    "topk_bm25": 100,
+    "routing_mode": "routed_with_general",
+    "reranking_enabled": true
+  },
+  "macro_nDCG@10": 0.15371294588242967
+}

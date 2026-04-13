@@ -43,10 +43,13 @@ from src.evaluation.cross_domain_eval import (
     load_cross_domain_queries,
     evaluate_cross_domain,
     OllamaJudge,
+    OpenAIJudge,
     CrossEncoderJudge,
     OLLAMA_DEFAULT_MODEL,
     OLLAMA_BASE_URL,
     OLLAMA_CACHE_PATH,
+    OPENAI_DEFAULT_MODEL,
+    OPENAI_CACHE_PATH,
 )
 
 logging.basicConfig(
@@ -72,8 +75,8 @@ def main() -> None:
     parser.add_argument("--override", default=None)
     parser.add_argument("--topk", type=int, default=10)
     parser.add_argument(
-        "--judge", choices=["llm", "cross_encoder", "none"], default="llm",
-        help="Relevance judge: llm (Ollama, default), cross_encoder, or none (domain metrics only).",
+        "--judge", choices=["llm", "openai", "cross_encoder", "none"], default="llm",
+        help="Relevance judge: llm (Ollama), openai (GPT-4o-mini), cross_encoder, or none.",
     )
     parser.add_argument("--ollama-model", default=OLLAMA_DEFAULT_MODEL,
                         help=f"Ollama model name (default: {OLLAMA_DEFAULT_MODEL})")
@@ -81,6 +84,10 @@ def main() -> None:
                         help=f"Ollama base URL (default: {OLLAMA_BASE_URL})")
     parser.add_argument("--ollama-cache", default=str(OLLAMA_CACHE_PATH),
                         help="Path to LLM judgement cache JSONL file.")
+    parser.add_argument("--openai-model", default=OPENAI_DEFAULT_MODEL,
+                        help=f"OpenAI model name (default: {OPENAI_DEFAULT_MODEL})")
+    parser.add_argument("--openai-key", default=None,
+                        help="OpenAI API key (or set OPENAI_API_KEY env var)")
     parser.add_argument("--output", default=None, help="Save JSON results to path.")
     args = parser.parse_args()
 
@@ -103,6 +110,14 @@ def main() -> None:
         )
         judge.load()
         judge_desc = f"LLM via Ollama ({args.ollama_model})"
+
+    elif args.judge == "openai":
+        judge = OpenAIJudge(
+            model=args.openai_model,
+            api_key=args.openai_key,
+        )
+        judge.load()
+        judge_desc = f"OpenAI ({args.openai_model})"
 
     elif args.judge == "cross_encoder":
         judge = CrossEncoderJudge(device=device)

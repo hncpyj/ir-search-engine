@@ -51,6 +51,7 @@ def main() -> None:
         min_per_domain=clf_cfg.get("min_queries_per_domain", 200),
         max_per_domain=clf_cfg.get("max_queries_per_domain", 5000),
         seed=cfg["system"].get("seed", 42),
+        index_root=cfg["paths"].get("index_root", "indexes"),
     )
 
 

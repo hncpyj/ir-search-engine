@@ -1,0 +1,10 @@
+{
+  "judge": "OpenAI (gpt-4o-mini)",
+  "metrics": {
+    "domain_coverage@10": 0.9230769230769231,
+    "mean_domains_in_top10": 1.9230769230769231,
+    "expected_domain_hit@10": 0.15384615384615385,
+    "n_queries": 26,
+    "openai_nDCG@10": 0.6518099231199893
+  }
+}

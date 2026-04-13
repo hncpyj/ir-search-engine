@@ -1,0 +1,131 @@
+{
+  "step": "latency_no_rerank",
+  "timestamp": "2026-04-11T11:46:28.191355",
+  "per_domain": {
+    "general": {
+      "normalize_ms_mean": 0.02313666433716814,
+      "normalize_ms_p95": 0.028974987799301744,
+      "classify_ms_mean": 16.0180666600354,
+      "classify_ms_p95": 20.12908500037155,
+      "retrieve_ms_mean": 290.672763347781,
+      "retrieve_ms_p95": 1005.2959000808172,
+      "fuse_ms_mean": 0.27954666487251717,
+      "fuse_ms_p95": 0.42652501724660374,
+      "rerank_ms_mean": 0.0004166698393722375,
+      "rerank_ms_p95": 0.000600004568696022,
+      "total_ms_mean": 307.0069666680259,
+      "total_ms_p95": 1024.816965038188
+    },
+    "scidocs": {
+      "normalize_ms_mean": 0.02367333509027958,
+      "normalize_ms_p95": 0.03066500066779554,
+      "classify_ms_mean": 16.424163322274882,
+      "classify_ms_p95": 18.820249958662313,
+      "retrieve_ms_mean": 410.23335000500083,
+      "retrieve_ms_p95": 613.0948099656961,
+      "fuse_ms_mean": 0.31216332766537863,
+      "fuse_ms_p95": 0.46372497454285616,
+      "rerank_ms_mean": 0.00037333229556679726,
+      "rerank_ms_p95": 0.000500003807246685,
+      "total_ms_mean": 427.005946667244,
+      "total_ms_p95": 630.3499049972742
+    },
+    "science": {
+      "normalize_ms_mean": 0.023566671491911013,
+      "normalize_ms_p95": 0.02885498688556254,
+      "classify_ms_mean": 18.01546999098112,
+      "classify_ms_p95": 22.249454999109727,
+      "retrieve_ms_mean": 345.13109999631223,
+      "retrieve_ms_p95": 472.01483004610054,
+      "fuse_ms_mean": 0.28878001030534506,
+      "fuse_ms_p95": 0.37839502329006786,
+      "rerank_ms_mean": 0.00037333617607752484,
+      "rerank_ms_p95": 0.000500003807246685,
+      "total_ms_mean": 363.470470008906,
+      "total_ms_p95": 492.8830100107006
+    },
+    "finance": {
+      "normalize_ms_mean": 0.02152667148038745,
+      "normalize_ms_p95": 0.028209981974214315,
+      "classify_ms_mean": 15.547313331626356,
+      "classify_ms_p95": 17.753579991403964,
+      "retrieve_ms_mean": 499.4344899818922,
+      "retrieve_ms_p95": 807.1514800249133,
+      "fuse_ms_mean": 0.26558001603310305,
+      "fuse_ms_p95": 0.3583349986001849,
+      "rerank_ms_mean": 0.0003900029696524143,
+      "rerank_ms_p95": 0.0005550042260438201,
+      "total_ms_mean": 515.2801433422914,
+      "total_ms_p95": 824.8745000106283
+    },
+    "medical": {
+      "normalize_ms_mean": 0.020416655267278355,
+      "normalize_ms_p95": 0.02197505091316998,
+      "classify_ms_mean": 15.178549999836832,
+      "classify_ms_p95": 17.434555012732744,
+      "retrieve_ms_mean": 565.501839997402,
+      "retrieve_ms_p95": 829.2126599815673,
+      "fuse_ms_mean": 0.2500233318035801,
+      "fuse_ms_p95": 0.2701300254557282,
+      "rerank_ms_mean": 0.0003566655019919078,
+      "rerank_ms_p95": 0.0004550034645944831,
+      "total_ms_mean": 580.9617933390351,
+      "total_ms_p95": 846.0093300032895
+    },
+    "biomedical": {
+      "normalize_ms_mean": 0.020963322216024,
+      "normalize_ms_p95": 0.02551996149122715,
+      "classify_ms_mean": 15.3238166628095,
+      "classify_ms_p95": 17.74067498045042,
+      "retrieve_ms_mean": 211.67847667044649,
+      "retrieve_ms_p95": 280.511924996972,
+      "fuse_ms_mean": 0.30374998847643536,
+      "fuse_ms_p95": 0.45650498359464103,
+      "rerank_ms_mean": 0.0003900029696524143,
+      "rerank_ms_p95": 0.000500003807246685,
+      "total_ms_mean": 227.34008332093558,
+      "total_ms_p95": 296.42761998111376
+    }
+  },
+  "aggregate": {
+    "normalize_ms_mean": 0.02,
+    "normalize_ms_p95": 0.03,
+    "classify_ms_mean": 16.08,
+    "classify_ms_p95": 19.02,
+    "retrieve_ms_mean": 387.11,
+    "retrieve_ms_p95": 667.88,
+    "fuse_ms_mean": 0.28,
+    "fuse_ms_p95": 0.39,
+    "rerank_ms_mean": 0.0,
+    "rerank_ms_p95": 0.0,
+    "total_ms_mean": 403.51,
+    "total_ms_p95": 685.89
+  },
+  "bottlenecks": [
+    {
+      "stage": "retrieve",
+      "mean_ms": 387.11,
+      "pct": 95.9
+    },
+    {
+      "stage": "classify",
+      "mean_ms": 16.08,
+      "pct": 4.0
+    },
+    {
+      "stage": "fuse",
+      "mean_ms": 0.28,
+      "pct": 0.1
+    },
+    {
+      "stage": "normalize",
+      "mean_ms": 0.02,
+      "pct": 0.0
+    },
+    {
+      "stage": "rerank",
+      "mean_ms": 0.0,
+      "pct": 0.0
+    }
+  ]
+}

@@ -1,0 +1,980 @@
+{
+  "step": "expanded_subjective",
+  "timestamp": "2026-04-11T11:43:53.270613",
+  "n_queries": 55,
+  "aggregate": {
+    "routing_accuracy": 0.6545,
+    "mean_cross_encoder_nDCG@10": 0.8008,
+    "expected_domain_hit_rate": 0.4182
+  },
+  "by_type": {
+    "cross_domain": {
+      "n": 25,
+      "routing_acc": 0.64,
+      "mean_nDCG": 0.7886
+    },
+    "single_domain": {
+      "n": 30,
+      "routing_acc": 0.6667,
+      "mean_nDCG": 0.811
+    }
+  },
+  "per_query": [
+    {
+      "query_id": "c01",
+      "query_text": "how does machine learning predict stock market trends",
+      "expected_domains": [
+        "finance",
+        "science"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9487,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7587,
+      "latency_ms": 550.6
+    },
+    {
+      "query_id": "c02",
+      "query_text": "cardiovascular effects of diabetes medications",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.7253,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8438,
+      "latency_ms": 237.72
+    },
+    {
+      "query_id": "c03",
+      "query_text": "AI applications in drug discovery and clinical trials",
+      "expected_domains": [
+        "science",
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9349,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7831,
+      "latency_ms": 386.17
+    },
+    {
+      "query_id": "c04",
+      "query_text": "impact of climate change on global food production economics",
+      "expected_domains": [
+        "science",
+        "finance"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.644,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.9639,
+      "latency_ms": 190.57
+    },
+    {
+      "query_id": "c05",
+      "query_text": "neural network architectures for medical image analysis",
+      "expected_domains": [
+        "scidocs",
+        "medical"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9857,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8169,
+      "latency_ms": 315.55
+    },
+    {
+      "query_id": "c06",
+      "query_text": "blockchain technology in healthcare data management",
+      "expected_domains": [
+        "finance",
+        "medical"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9849,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7704,
+      "latency_ms": 300.33
+    },
+    {
+      "query_id": "c07",
+      "query_text": "protein structures involved in COVID-19 infection",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.9618,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.6399,
+      "latency_ms": 500.48
+    },
+    {
+      "query_id": "c08",
+      "query_text": "algorithmic trading strategies using reinforcement learning",
+      "expected_domains": [
+        "finance",
+        "scidocs"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.5354,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7008,
+      "latency_ms": 376.35
+    },
+    {
+      "query_id": "c09",
+      "query_text": "CRISPR gene therapy for inherited genetic disorders",
+      "expected_domains": [
+        "biomedical",
+        "science"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.4582,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.6537,
+      "latency_ms": 348.45
+    },
+    {
+      "query_id": "c10",
+      "query_text": "natural language processing for clinical note extraction",
+      "expected_domains": [
+        "scidocs",
+        "medical"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9828,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8573,
+      "latency_ms": 327.97
+    },
+    {
+      "query_id": "c11",
+      "query_text": "P/E ratio and stock valuation methods",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9961,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.9155,
+      "latency_ms": 414.3
+    },
+    {
+      "query_id": "c12",
+      "query_text": "mechanism of action of metformin in type 2 diabetes",
+      "expected_domains": [
+        "medical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.9778,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.9065,
+      "latency_ms": 622.12
+    },
+    {
+      "query_id": "c13",
+      "query_text": "transformer attention mechanism in sequence models",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9834,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8077,
+      "latency_ms": 298.84
+    },
+    {
+      "query_id": "c14",
+      "query_text": "how does quantum computing work",
+      "expected_domains": [
+        "science"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.9848,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.683,
+      "latency_ms": 132.41
+    },
+    {
+      "query_id": "c15",
+      "query_text": "role of microRNA in gene regulation and cancer",
+      "expected_domains": [
+        "biomedical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.9449,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.9388,
+      "latency_ms": 573.93
+    },
+    {
+      "query_id": "c16",
+      "query_text": "inflation and central bank monetary policy",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9958,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.6768,
+      "latency_ms": 403.76
+    },
+    {
+      "query_id": "c17",
+      "query_text": "symptoms and treatment of acute myocardial infarction",
+      "expected_domains": [
+        "medical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.9675,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.9243,
+      "latency_ms": 497.07
+    },
+    {
+      "query_id": "c18",
+      "query_text": "graph neural networks for molecular property prediction",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.986,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.6797,
+      "latency_ms": 317.51
+    },
+    {
+      "query_id": "c19",
+      "query_text": "how do black holes emit Hawking radiation",
+      "expected_domains": [
+        "science"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.99,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7359,
+      "latency_ms": 182.93
+    },
+    {
+      "query_id": "c20",
+      "query_text": "signal transduction pathways in cell growth",
+      "expected_domains": [
+        "biomedical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.7166,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.963,
+      "latency_ms": 418.27
+    },
+    {
+      "query_id": "c21",
+      "query_text": "how does the internet work",
+      "expected_domains": [
+        "general"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.997,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8504,
+      "latency_ms": 127.63
+    },
+    {
+      "query_id": "c22",
+      "query_text": "history of the Roman Empire",
+      "expected_domains": [
+        "general"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.9767,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.7918,
+      "latency_ms": 132.93
+    },
+    {
+      "query_id": "c23",
+      "query_text": "time management and productivity techniques",
+      "expected_domains": [
+        "general"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9669,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8674,
+      "latency_ms": 259.98
+    },
+    {
+      "query_id": "c24",
+      "query_text": "what causes earthquakes and tsunamis",
+      "expected_domains": [
+        "general",
+        "science"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.9974,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8784,
+      "latency_ms": 134.09
+    },
+    {
+      "query_id": "c25",
+      "query_text": "electric vehicles vs gasoline cars comparison",
+      "expected_domains": [
+        "general"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.7982,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.9772,
+      "latency_ms": 148.5
+    },
+    {
+      "query_id": "c26",
+      "query_text": "apple",
+      "expected_domains": [
+        "general"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9943,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8016,
+      "latency_ms": 116.19
+    },
+    {
+      "query_id": "c27",
+      "query_text": "treatment",
+      "expected_domains": [
+        "medical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9943,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7951,
+      "latency_ms": 111.1
+    },
+    {
+      "query_id": "c28",
+      "query_text": "best investment strategy for retirement",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9965,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8709,
+      "latency_ms": 339.01
+    },
+    {
+      "query_id": "c29",
+      "query_text": "cancer",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9943,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8993,
+      "latency_ms": 121.26
+    },
+    {
+      "query_id": "c30",
+      "query_text": "deep learning",
+      "expected_domains": [
+        "scidocs",
+        "science"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9776,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8282,
+      "latency_ms": 132.6
+    },
+    {
+      "query_id": "c31",
+      "query_text": "economic impact of pandemic lockdowns on healthcare",
+      "expected_domains": [
+        "finance",
+        "medical"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.2318,
+      "domains_in_top10": [
+        "biomedical",
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7904,
+      "latency_ms": 384.15
+    },
+    {
+      "query_id": "c32",
+      "query_text": "biomarkers in precision medicine for cancer",
+      "expected_domains": [
+        "biomedical",
+        "medical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.4344,
+      "domains_in_top10": [
+        "biomedical",
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8019,
+      "latency_ms": 534.35
+    },
+    {
+      "query_id": "c33",
+      "query_text": "renewable energy technology investment opportunities",
+      "expected_domains": [
+        "science",
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9905,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7154,
+      "latency_ms": 316.16
+    },
+    {
+      "query_id": "c34",
+      "query_text": "machine learning methods for protein folding",
+      "expected_domains": [
+        "scidocs",
+        "biomedical",
+        "science"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9829,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7875,
+      "latency_ms": 286.76
+    },
+    {
+      "query_id": "c35",
+      "query_text": "gut microbiome effect on mental health disorders",
+      "expected_domains": [
+        "biomedical",
+        "medical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9922,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.6686,
+      "latency_ms": 224.0
+    },
+    {
+      "query_id": "c36",
+      "query_text": "portfolio diversification and risk management",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9858,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.7475,
+      "latency_ms": 309.66
+    },
+    {
+      "query_id": "c37",
+      "query_text": "sepsis treatment in emergency department",
+      "expected_domains": [
+        "medical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9025,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8233,
+      "latency_ms": 225.47
+    },
+    {
+      "query_id": "c38",
+      "query_text": "contrastive learning for visual representations",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9847,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.7393,
+      "latency_ms": 257.29
+    },
+    {
+      "query_id": "c39",
+      "query_text": "gravitational lensing observations and dark matter",
+      "expected_domains": [
+        "science"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9698,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8475,
+      "latency_ms": 297.44
+    },
+    {
+      "query_id": "c40",
+      "query_text": "angiogenesis in tumor metastasis",
+      "expected_domains": [
+        "biomedical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.8775,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.9464,
+      "latency_ms": 199.33
+    },
+    {
+      "query_id": "c41",
+      "query_text": "covid vaccine effectiveness against new variants",
+      "expected_domains": [
+        "medical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.8656,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.7474,
+      "latency_ms": 406.05
+    },
+    {
+      "query_id": "c42",
+      "query_text": "ESG investing and corporate sustainability",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9947,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.6482,
+      "latency_ms": 359.4
+    },
+    {
+      "query_id": "c43",
+      "query_text": "attention is all you need",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.5141,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8412,
+      "latency_ms": 192.12
+    },
+    {
+      "query_id": "c44",
+      "query_text": "how do antibiotics work and bacterial resistance",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.6044,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.9446,
+      "latency_ms": 262.24
+    },
+    {
+      "query_id": "c45",
+      "query_text": "federated learning privacy preserving machine learning",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9829,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.665,
+      "latency_ms": 287.77
+    },
+    {
+      "query_id": "c46",
+      "query_text": "relationship between sleep and immune function",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.981,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.6186,
+      "latency_ms": 148.33
+    },
+    {
+      "query_id": "c47",
+      "query_text": "cryptocurrency regulation and financial stability",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9939,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8274,
+      "latency_ms": 330.15
+    },
+    {
+      "query_id": "c48",
+      "query_text": "environmental impacts of plastic pollution",
+      "expected_domains": [
+        "science",
+        "general"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.9567,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8443,
+      "latency_ms": 212.02
+    },
+    {
+      "query_id": "c49",
+      "query_text": "how does immunotherapy work for cancer",
+      "expected_domains": [
+        "medical",
+        "biomedical"
+      ],
+      "top1_domain": "medical",
+      "top1_confidence": 0.925,
+      "domains_in_top10": [
+        "general",
+        "medical"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8753,
+      "latency_ms": 417.46
+    },
+    {
+      "query_id": "c50",
+      "query_text": "knowledge distillation for model compression",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9844,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8261,
+      "latency_ms": 272.5
+    },
+    {
+      "query_id": "c51",
+      "query_text": "supply chain disruptions macroeconomic effects",
+      "expected_domains": [
+        "finance",
+        "general"
+      ],
+      "top1_domain": "general",
+      "top1_confidence": 0.661,
+      "domains_in_top10": [
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.7954,
+      "latency_ms": 126.73
+    },
+    {
+      "query_id": "c52",
+      "query_text": "neuroplasticity and brain rewiring mechanisms",
+      "expected_domains": [
+        "biomedical",
+        "science"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.829,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": false,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.6616,
+      "latency_ms": 261.95
+    },
+    {
+      "query_id": "c53",
+      "query_text": "zero shot learning and transfer learning",
+      "expected_domains": [
+        "scidocs"
+      ],
+      "top1_domain": "scidocs",
+      "top1_confidence": 0.9745,
+      "domains_in_top10": [
+        "general",
+        "scidocs"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.8719,
+      "latency_ms": 299.75
+    },
+    {
+      "query_id": "c54",
+      "query_text": "mRNA vaccines instruct cells to produce proteins",
+      "expected_domains": [
+        "medical",
+        "biomedical",
+        "science"
+      ],
+      "top1_domain": "biomedical",
+      "top1_confidence": 0.881,
+      "domains_in_top10": [
+        "biomedical",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": false,
+      "cross_encoder_nDCG@10": 0.8169,
+      "latency_ms": 234.97
+    },
+    {
+      "query_id": "c55",
+      "query_text": "interest rate decisions and bond market reactions",
+      "expected_domains": [
+        "finance"
+      ],
+      "top1_domain": "finance",
+      "top1_confidence": 0.9962,
+      "domains_in_top10": [
+        "finance",
+        "general"
+      ],
+      "routing_correct": true,
+      "expected_domain_hit": true,
+      "cross_encoder_nDCG@10": 0.6144,
+      "latency_ms": 449.69
+    }
+  ]
+}
