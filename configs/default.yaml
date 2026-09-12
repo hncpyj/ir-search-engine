@@ -133,3 +133,35 @@ evaluation:
   metrics: ["mrr@10", "ndcg@10", "recall@100", "recall@1000"]
   latency_trials: 50
   latency_warmup: 5
+
+generation:
+  backend: "ollama"                        # "ollama" | "openai"
+  model: "llama3.1:8b-instruct-q4_K_M"
+  base_url: "http://localhost:11434"
+  temperature: 0.1
+  max_tokens: 300
+  topk_passages: 5                         # passages passed to generator
+  seed: 42
+  prompt_mode: "strict"                    # "strict" (only passages) | "partial" (supplement with knowledge)
+
+grounding:
+  n_queries: 100                           # per domain (use --n-queries to override)
+  n_seeds: 3                               # repeat runs per query for variance
+  similarity_threshold: 0.90              # cosine sim below this → answer changed
+  conditions:
+    - normal
+    - no_retrieval
+    - swapped_context
+    - random_in_domain
+    - shuffled_order
+    - corrupted_context                    # Faithfulness-QA style: lexical inversions + numeric scaling
+
+  # Per-domain overrides — applied automatically; CLI --prompt-mode takes precedence
+  domain_overrides:
+    science:
+      prompt_mode: "claim_verify"          # SciFact = fact verification, not QA
+      n_seeds: 5                           # more seeds to reduce variance on small answered-pair counts
+    finance:
+      prompt_mode: "strict"                # FiQA has proper QA questions; strict mode applies
+    general:
+      prompt_mode: "strict"

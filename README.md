@@ -27,11 +27,6 @@ ONLINE:   Query → BERT Classifier → Route → Dense+BM25 Retrieval → RRF F
 # Python 3.10+
 pip install -r requirements.txt
 
-# Java 11+ required for BM25 (Pyserini)
-brew install openjdk@11        # macOS
-sudo apt install openjdk-11-jdk  # Linux
-java -version                  # verify
-
 # GPU: faiss-gpu requires CUDA 11+
 # CPU-only fallback: replace faiss-gpu with faiss-cpu in requirements.txt
 ```
@@ -70,7 +65,7 @@ Output: `indexes/faiss/{domain}/faiss.index`, `docstore.parquet`, `id_mapping.js
 
 ### Step 3 — (Optional) Build BM25 indexes
 
-Requires Java 11+. Only runs for domains with `bm25_enabled: true` (default: false in smoke config).
+Only runs for domains with `bm25_enabled: true` (default: false in smoke config).
 
 ```bash
 python scripts/build_bm25.py --config configs/full.yaml   # all bm25-enabled domains

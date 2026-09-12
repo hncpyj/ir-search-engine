@@ -65,7 +65,8 @@ def format_results_html(results: list, topk: int) -> str:
     if not results:
         return "<p style='color:#888'>No results found.</p>"
 
-    html = ""
+    shown = min(topk, len(results))
+    html = f"<p style='color:#6b7280; font-size:0.82em; margin-bottom:10px;'>Showing top {shown} results</p>"
     for i, r in enumerate(results[:topk]):
         colour = DOMAIN_COLOURS.get(r.domain, "#888")
         icon   = DOMAIN_ICONS.get(r.domain, "📄")
@@ -74,11 +75,13 @@ def format_results_html(results: list, topk: int) -> str:
             text += "…"
         title  = f"<b>{r.title}</b><br>" if r.title else ""
 
-        score_parts = [f"dense: {r.score:.4f}"]
-        if r.fused_score:
+        score_parts = []
+        if r.fused_score and r.fused_score > 0:
             score_parts.append(f"fused: {r.fused_score:.4f}")
-        if r.colbert_score:
-            score_parts.append(f"colbert: {r.colbert_score:.4f}")
+        else:
+            score_parts.append(f"score: {r.score:.4f}")
+        if r.colbert_score and r.colbert_score > 0:
+            score_parts.append(f"rerank: {r.colbert_score:.4f}")
         scores = " &nbsp;|&nbsp; ".join(score_parts)
 
         html += f"""
@@ -123,7 +126,21 @@ def search(query: str, topk: int, routing_mode: str) -> tuple[str, str, str]:
     top1_icon  = DOMAIN_ICONS.get(clf.top1_domain, "📄")
     top2_icon  = DOMAIN_ICONS.get(clf.top2_domain, "📄")
     top1_col   = DOMAIN_COLOURS.get(clf.top1_domain, "#888")
-    clf_html = f"""
+    is_routed_only = (routing_mode.lower().replace(" ", "_") == "routed_only")
+    if is_routed_only:
+        clf_html = f"""
+    <div style="background:#f9fafb; border-radius:8px; padding:10px 14px;
+                font-size:0.85em; display:flex; gap:16px; flex-wrap:wrap;">
+      <span>🎯 <b>Top-1:</b>
+        <span style="color:{top1_col}; font-weight:600;">
+          {top1_icon} {clf.top1_domain}
+        </span> ({clf.top1_prob:.1%})
+      </span>
+      <span>🥈 <b>Top-2:</b> {top2_icon} {clf.top2_domain} ({clf.top2_prob:.1%})</span>
+    </div>
+    """
+    else:
+        clf_html = f"""
     <div style="background:#f9fafb; border-radius:8px; padding:10px 14px;
                 font-size:0.85em; display:flex; gap:16px; flex-wrap:wrap;">
       <span>🎯 <b>Top-1:</b>
@@ -155,7 +172,12 @@ def search(query: str, topk: int, routing_mode: str) -> tuple[str, str, str]:
     """
 
     # ── Results ────────────────────────────────────────────────────────────
-    results_html = format_results_html(result["results"], topk)
+    # For routed_only: visually filter to top-1 domain only
+    if is_routed_only:
+        display_results = [r for r in result["results"] if r.domain == clf.top1_domain]
+    else:
+        display_results = result["results"]
+    results_html = format_results_html(display_results, topk)
 
     return clf_html, lat_html, results_html
 
@@ -174,9 +196,8 @@ def build_ui() -> gr.Blocks:
         gr.Markdown(
             """
             # 🔍 Multi-Domain IR Search Engine
-            **6 domains:** 🌐 General &nbsp;·&nbsp; 🔬 Science &nbsp;·&nbsp;
-            📈 Finance &nbsp;·&nbsp; 🏥 Medical &nbsp;·&nbsp;
-            ⚖️ Legal &nbsp;·&nbsp; 🧬 Biomedical
+            **6 domains:** 🌐 General &nbsp;·&nbsp; 🔬 Science &nbsp;·&nbsp; 📚 SciDocs &nbsp;·&nbsp;
+            📈 Finance &nbsp;·&nbsp; 🏥 Medical &nbsp;·&nbsp; 🧬 Biomedical
             """,
         )
 
@@ -202,7 +223,7 @@ def build_ui() -> gr.Blocks:
 
         with gr.Row():
             topk_slider = gr.Slider(
-                minimum=1, maximum=20, value=10, step=1, label="Top-K results"
+                minimum=1, maximum=50, value=10, step=1, label="Top-K results"
             )
             routing_radio = gr.Radio(
                 choices=["routed_with_general", "routed_only", "broadcast"],
@@ -213,14 +234,14 @@ def build_ui() -> gr.Blocks:
         # ── Example queries ───────────────────────────────────────────────
         gr.Examples(
             examples=[
-                ["what causes alzheimer's disease",          10, "routed_with_general"],
-                ["ECHR fair trial rights article 6",         10, "routed_with_general"],
-                ["options pricing black scholes model",      10, "routed_with_general"],
-                ["CRISPR gene editing mechanism",            10, "routed_with_general"],
-                ["COVID-19 cytokine storm treatment",        10, "routed_with_general"],
-                ["PageRank algorithm web search",            10, "broadcast"],
+                ["options pricing black scholes model",       "routed_with_general"],
+                ["CRISPR gene editing mechanism",             "routed_with_general"],
+                ["COVID-19 cytokine storm treatment",         "routed_with_general"],
+                ["what is PageRank in web search",            "routed_with_general"],
+                ["systematic review evidence based medicine", "routed_with_general"],
+                ["economic impact of pandemic on healthcare",  "broadcast"],
             ],
-            inputs=[query_box, topk_slider, routing_radio],
+            inputs=[query_box, routing_radio],
         )
 
         gr.Markdown("---")

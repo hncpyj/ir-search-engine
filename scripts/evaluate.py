@@ -78,6 +78,10 @@ def evaluate_single_domain(
     if max_queries and len(queries_df) > max_queries:
         queries_df = queries_df.sample(n=max_queries, random_state=42).reset_index(drop=True)
         logger.info(f"[eval:{domain}] Sampled {max_queries} queries (from {len(annotated_qids)} annotated)")
+        # Filter qrels to sampled queries only — prevents ir_measures from
+        # averaging nDCG over un-run queries (which would score 0 and deflate metrics).
+        sampled_qids = set(queries_df["query_id"].astype(str))
+        qrels_df = qrels_df[qrels_df["query_id"].astype(str).isin(sampled_qids)]
 
     logger.info(
         f"[eval:{domain}] Evaluating {len(queries_df)} queries "

@@ -50,8 +50,18 @@ class ColBERTReranker:
                 "Install with: pip install ragatouille"
             ) from e
 
-        self._model = RAGPretrainedModel.from_pretrained(self.model_name)
-        logger.info(f"ColBERTReranker loaded: {self.model_name}")
+        try:
+            self._model = RAGPretrainedModel.from_pretrained(self.model_name)
+            logger.info(f"ColBERTReranker loaded: {self.model_name}")
+        except RuntimeError as e:
+            if "Ninja" in str(e) or "ninja" in str(e):
+                logger.warning(
+                    f"ColBERT could not load C++ extensions (ninja not available). "
+                    f"Reranking will be skipped. Error: {e}"
+                )
+                self._model = None
+            else:
+                raise
 
     def rerank(
         self,
@@ -73,7 +83,8 @@ class ColBERTReranker:
             with their original fused scores preserved.
         """
         if self._model is None:
-            raise RuntimeError("Call load() before rerank().")
+            logger.warning("ColBERT model not loaded (ninja unavailable) — returning candidates unchanged.")
+            return candidates
 
         cap = topk if topk is not None else self.topk
         to_rerank = candidates[:cap]
