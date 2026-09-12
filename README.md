@@ -141,6 +141,64 @@ Triggered with `--ablation` flag on `evaluate.py`:
 | `routing_routed_general` | Top-1 domain + general fallback |
 | `routing_routed_only` | Top-1 domain only |
 
+## RAG Grounding Evaluation
+
+Does the system actually *use* the passages it retrieves, or does it answer from parametric memory? To measure this, we apply causal context interventions across three domains (100 queries × 3 seeds each) and compare generated answers against the `normal` baseline using sentence-level cosine similarity (`all-MiniLM-L6-v2`).
+
+### Intervention Conditions
+
+| Condition | What it tests |
+|-----------|---------------|
+| `normal` | Baseline — top-5 retrieved passages |
+| `no_retrieval` | Parametric memory — model answers with no context |
+| `swapped_context` | Context sensitivity — passages from a different query (same domain) |
+| `random_in_domain` | Weak swap — random passages from the same domain corpus |
+| `shuffled_order` | Position bias — same passages, permuted order |
+| `corrupted_context` | Noise robustness — minor token-level corruption applied |
+
+**Grounding score** = min(conditional grounding) over content-swap conditions (`swapped_context`, `random_in_domain`), where conditional grounding = fraction of *answered* pairs where the answer changed. Abstentions are excluded from the denominator, following Wallat et al. (arXiv:2412.18004).
+
+### Results (100 queries × 3 seeds)
+
+| Domain | Grounding Score | Swapped Δ | Random Δ | Sentence Faithfulness |
+|--------|:--------------:|:---------:|:--------:|:---------------------:|
+| general | **0.875** | 98.3% | 96.0% | 0.75 |
+| science | **0.905** | 84.7% | 85.0% | 0.26 |
+| finance | **1.000** | 97.3% | 95.0% | 0.41 |
+
+**Swapped / Random Δ**: fraction of query pairs where the answer changed when retrieval context was replaced with an irrelevant substitute.  
+**Sentence Faithfulness**: cosine similarity between answer sentences and retrieved passages (normal condition); lower = answers diverge from source text.  
+Science uses `claim_verify` prompt mode (SUPPORTED / REFUTED / NOT ENOUGH INFO), which suppresses short-form answers and reduces faithfulness scores by design.
+
+```bash
+# Run grounding evaluation (single domain)
+python scripts/eval_grounding.py --config configs/default.yaml \
+  --domain science --n-queries 100 --n-seeds 3 \
+  --output results/grounding_v3/
+
+# Smoke test (5 queries, 1 seed)
+python scripts/eval_grounding.py --config configs/default.yaml \
+  --domain general --n-queries 5 --n-seeds 1
+```
+
+Output: `{domain}_raw.parquet`, `{domain}_summary.json`, `{domain}_summary.md`
+
+## Statistical A/B Testing
+
+`scripts/eval_ab.py` compares two grounding evaluation runs (e.g., different prompt modes, temperatures, or retrieval strategies) across **21 metrics** spanning all intervention conditions. To control the false discovery rate across correlated tests, we apply **Benjamini-Hochberg FDR correction** (α = 0.05) rather than Bonferroni, which would be overly conservative for metrics that share the same underlying query pairs.
+
+Effect sizes are reported as Cohen's *h* (proportions) or Cohen's *d* (continuous). Primary test: paired Welch's *t*-test; independent fallback for unmatched samples. Significant findings include direction (improvement / regression) and Wilson 95% CIs.
+
+```bash
+python scripts/eval_ab.py \
+  --control   results/grounding_v3/science_raw.parquet \
+  --treatment results/grounding_ab/science_raw.parquet \
+  --control-name strict --treatment-name partial \
+  --domain science --output results/grounding_ab/
+```
+
+Output: Markdown report + machine-readable JSON with per-metric p-values, corrected p-values, and effect sizes.
+
 ## Configuration
 
 - `configs/default.yaml` — smoke test (50k MS MARCO, CPU, no reranking, HNSW)
