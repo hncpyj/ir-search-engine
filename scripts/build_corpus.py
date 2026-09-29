@@ -24,12 +24,7 @@ import pandas as pd
 # Allow imports from project root
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.adapters.msmarco_adapter import MSMarcoAdapter
-from src.adapters.scifact_adapter import ScifactAdapter
-from src.adapters.scidocs_adapter import ScidocsAdapter
-from src.adapters.fiqa_adapter import FiqaAdapter
-from src.adapters.treccovid_adapter import TrecCovidAdapter
-from src.adapters.nfcorpus_adapter import NfcorpusAdapter
+from src.adapters import ADAPTER_MAP, TOKENIZER_MAP
 from src.preprocessing.chunker import SlidingWindowChunker
 from src.config import load_config
 
@@ -38,25 +33,6 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
 )
 logger = logging.getLogger("build_corpus")
-
-ADAPTER_MAP = {
-    "general": MSMarcoAdapter,
-    "scidocs": ScidocsAdapter,
-    "science": ScifactAdapter,
-    "finance": FiqaAdapter,
-    "medical": TrecCovidAdapter,
-    "biomedical": NfcorpusAdapter,
-}
-
-# Use the domain's own encoder tokenizer for chunking (consistent token counts).
-TOKENIZER_MAP = {
-    "general": "sentence-transformers/msmarco-bert-base-dot-v5",
-    "scidocs": "allenai/scibert_scivocab_uncased",
-    "science": "allenai/scibert_scivocab_uncased",
-    "finance": "ProsusAI/finbert",
-    "medical": "emilyalsentzer/Bio_ClinicalBERT",
-    "biomedical": "dmis-lab/biobert-base-cased-v1.1",
-}
 
 
 def build_domain(
