@@ -12,4 +12,5 @@ pyyaml>=6.0
 scikit-learn>=1.3.0
 numpy>=1.24.0
 tqdm>=4.65.0
+sentencepiece>=0.1.99   # required by BioBERT tokenizer (dmis-lab/biobert-base-cased-v1.1)
 pyspark>=3.4.0          # optional: distributed corpus preprocessing (build_corpus_spark.py)

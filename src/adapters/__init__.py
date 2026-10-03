@@ -20,5 +20,5 @@ TOKENIZER_MAP = {
     "science":    "allenai/scibert_scivocab_uncased",
     "finance":    "ProsusAI/finbert",
     "medical":    "emilyalsentzer/Bio_ClinicalBERT",
-    "biomedical": "dmis-lab/biobert-base-cased-v1.1",
+    "biomedical": "microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract",
 }

@@ -62,7 +62,7 @@ domains:
   medical:
     enabled: true
     dataset: "mteb/trec-covid"
-    max_docs: 50000          # cap for default config (full 171k in full.yaml)
+    max_docs: null            # full 171k corpus
     encoder_model: "BAAI/bge-base-en-v1.5"  # was Bio_ClinicalBERT (non-retrieval MLM); replaced with retrieval-trained encoder
     batch_size: 32
     faiss_type: "HNSW"
